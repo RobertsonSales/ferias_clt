@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Avançado de Férias e Provisão de Folha — CLT</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #1e40af;
+            --secondary: #0d9488;
+            --background: #f1f5f9;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border: #cbd5e1;
+            --danger: #dc2626;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 4px solid var(--primary);
+            padding-bottom: 1rem;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr 1.4fr;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            border-bottom: 2px solid var(--background);
+            padding-bottom: 0.4rem;
+        }
+
+        .section-sub {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 1rem 0 0.5rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            background-color: #fafafa;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+        }
+
+        .checkbox-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+            margin-top: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0b7a70;
+        }
+
+        .res-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.88rem;
+        }
+
+        .res-table th, .res-table td {
+            padding: 0.6rem;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .res-table th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .text-right { text-align: right !important; }
+        .val-prov { color: var(--secondary); font-weight: 600; }
+        .val-desc { color: var(--danger); font-weight: 600; }
+        .row-total { font-weight: bold; background-color: #f8fafc; }
+        .legal-ref { font-size: 0.75rem; color: var(--text-muted); font-style: italic; display: block; }
+
+        .folha-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .folha-title {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 0.2rem;
+        }
+
+        .status-api {
+            font-size: 0.8rem;
+            color: #0284c7;
+            background: #e0f2fe;
+            padding: 0.4rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        #recibo-impressao { display: none; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #recibo-impressao, #recibo-impressao * { visibility: visible; }
+            #recibo-impressao {
+                display: block;
+                position: absolute;
+                left: 0; top: 0; width: 100%;
+                color: #000; background: #fff;
+                padding: 10px;
+            }
+            .imp-block {
+                border: 2px solid #000;
+                padding: 15px;
+                margin-bottom: 25px;
+                border-radius: 4px;
+                page-break-inside: avoid;
+            }
+            .imp-hdr {
+                text-align: center;
+                border-bottom: 2px solid #000;
+                padding-bottom: 8px;
+                margin-bottom: 12px;
+            }
+            .imp-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 5px;
+                font-size: 0.85rem;
+                margin-bottom: 10px;
+            }
+            .imp-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+                font-size: 0.8rem;
+            }
+            .imp-table th, .imp-table td {
+                border: 1px solid #000;
+                padding: 5px;
+            }
+            .imp-table th { background-color: #f2f2f2 !important; }
+            .sign-space {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 45px;
+                font-size: 0.8rem;
+            }
+            .sign-line {
+                border-top: 1px solid #000;
+                width: 42%;
+                text-align: center;
+                padding-top: 3px;
+            }
+            .page-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Emissor Avançado de Recibo e Impacto em Folha</h1>
+        <p>Conformidade Estrita com a CLT & Atualização Dinâmica de Tabelas Oficiais</p>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Parâmetros de Entrada</h2>
+            <div id="apiStatusBox" class="status-api">Buscando tabelas de impostos vigentes via API...</div>
+            <form id="mainForm">
+                <div class="section-sub">Identificação Institucional</div>
+                <div class="form-group">
+                    <label>Fonte Pagadora (Razão Social)</label>
+                    <input type="text" id="empresa" value="Matriz Industrial de Férias S.A." required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Empregado</label>
+                        <input type="text" id="empregado" value="Julio César da Silva" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Matrícula</label>
+                        <input type="text" id="matricula" value="MTR-2026-089" required>
+                    </div>
+                </div>
+
+                <div class="section-sub">Bases Contratuais</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Salário-Base (R$)</label>
+                        <input type="text" id="salario" value="R$ 8.000,00" class="mask-money" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Adicionais Fixos (R$)</label>
+                        <input type="text" id="adicionais" value="R$ 400,00" class="mask-money">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Média Variáveis Férias (R$)</label>
+                        <input type="text" id="mediaFerias" value="R$ 3.620,00" class="mask-money">
+                    </div>
+                    <div class="form-group">
+                        <label>Faltas no Período Aquisitivo</label>
+                        <input type="number" id="faltas" value="0" min="0">
+                    </div>
+                </div>
+
+                <div class="section-sub">Programação do Gozo</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Início das Férias</label>
+                        <input type="date" id="dataInicio" value="2026-06-11" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Dias de Gozo Pretendidos</label>
+                        <input type="number" id="diasGozo" value="30" min="10" max="30" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="abono"> Vender Abono Pecuniário (10 dias) - <em>Art. 143 da CLT</em>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="adiantamento13"> Solicitar Adiantamento da 1ª Parcela do 13º Salário
+                    </label>
+                </div>
+
+                <button type="button" class="btn-primary" onclick="executarCalculosGlobais()">Calcular e Atualizar</button>
+                <button type="button" class="btn-secondary" onclick="window.print()">Emitir Documentos (PDF)</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Painel de Resultados e Demonstrativos</h2>
+            <div id="dashboardResultados">
+                <p style="color: var(--text-muted); text-align: center; padding-top: 2rem;">Aguardando execução dos cálculos...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="recibo-impressao">
+    <div class="imp-block">
+        <div class="imp-hdr">
+            <h2>RECIBO DE PAGAMENTO DE FÉRIAS</h2>
+            <p style="font-size:0.75rem;">Emitido nos termos do Artigo 145 da Consolidação das Leis do Trabalho (CLT)</p>
+            <p style="font-size:0.8rem; font-weight: bold; margin-top:4px;">Tabelas de Encargos - Mês de Referência: <span class="ref-mes-ano"></span></p>
+        </div>
+        <div class="imp-grid">
+            <div><strong>Empregador (Fonte Pagadora):</strong> <span id="pCompany"></span></div>
+            <div><strong>Matrícula:</strong> <span id="pMatricula"></span></div>
+            <div style="grid-column: span 2;"><strong>Empregado:</strong> <span id="pEmployee"></span></div>
+            <div style="grid-column: span 2;"><strong>Período de Gozo:</strong> de <span id="pDataInic"></span> a <span id="pDataFim"></span> (<span id="pDias"></span> dias)</div>
+        </div>
+        <table class="imp-table" id="tableReciboImp">
+            <thead>
+                <tr><th>Rúbrica / Descrição Evento</th><th>Ref. Legal</th><th style="text-align:right;">Proventos</th><th style="text-align:right;">Descontos</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="sign-space">
+            <div class="sign-line">Data: ____/____/_______</div>
+            <div class="sign-line">Assinatura do Empregado</div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="imp-block">
+        <div class="imp-hdr">
+            <h2>DEMONSTRATIVO DE INTEGRAÇÃO NA FOLHA DE PAGAMENTO</h2>
+            <p style="font-size:0.75rem;">Apropriação e rateio das competências em regime de competência contábil</p>
+        </div>
+        <div class="imp-grid">
+            <div><strong>Empregado:</strong> <span id="pEmployeeFolha"></span></div>
+            <div><strong>Matrícula:</strong> <span id="pMatriculaFolha"></span></div>
+        </div>
+        <div id="folhaCompetenciasImp"></div>
+    </div>
+</div>
+
+<script>
+    // Tabelas Locais para Fallback (Ano Referência: 2026)
+    let tabelaINSS = [
+        { limite: 1621.00, aliquota: 0.075 },
+        { limite: 2902.84, aliquota: 0.09 },
+        { limite: 4354.27, aliquota: 0.12 },
+        { limite: 8475.55, aliquota: 0.14 }
+    ];
+    let tetoINSS = 988.09;
+
+    let tabelaIRRF = [
+        { limite: 2428.80, aliquota: 0.0, deducao: 0.0 },
+        { limite: 2826.65, aliquota: 0.075, deducao: 182.16 },
+        { limite: 3751.05, aliquota: 0.15, deducao: 394.16 },
+        { limite: 4664.68, aliquota: 0.225, deducao: 675.49 },
+        { limite: Infinity, aliquota: 0.275, deducao: 908.72 }
+    ];
+    let acrescimoBrutoIRRF = 0.00133145;
+
+    let mesReferenciaGlobal = "";
+
+    // Carregamento dinâmico e autônomo das tabelas vigentes via API aberta
+    async function carregarTabelasTributarias(dataFiltro) {
+        const statusBox = document.getElementById('apiStatusBox');
+        const dataObj = dataFiltro ? new Date(dataFiltro) : new Date();
+        const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+        const ano = dataObj.getFullYear();
+        mesReferenciaGlobal = `${mes}/${ano}`;
+
+        try {
+            // Simulando requisição autônoma para API pública de tabelas governamentais/tributárias brasileiras
+            // Substituível pelo endpoint real de produção desejado (Ex: API de dados abertos ou microsserviço interno)
+            const response = await fetch(`https://api.exemplo.gov.br/tributos/vigentes?data=${ano}-${mes}`, { signal: AbortSignal.timeout(2500) });
+            if (response.ok) {
+                const data = await response.json();
+                tabelaINSS = data.inss.faixas;
+                tetoINSS = data.inss.teto;
+                tabelaIRRF = data.irrf.faixas;
+                acrescimoBrutoIRRF = data.irrf.notaAcrescimo;
+                statusBox.style.backgroundColor = "#dcfce7";
+                statusBox.style.color = "#15803d";
+                statusBox.innerText = `Tabelas atualizadas online com sucesso para a referência: ${mesReferenciaGlobal}`;
+            } else {
+                throw new Error("API Indisponível");
+            }
+        } catch (err) {
+            statusBox.style.backgroundColor = "#fee2e2";
+            statusBox.style.color = "#b91c1c";
+            statusBox.innerText = `Modo Offline: Utilizando tabelas armazenadas com referência jurídica para ${mesReferenciaGlobal}`;
+        }
+        
+        document.querySelectorAll('.ref-mes-ano').forEach(el => el.innerText = mesReferenciaGlobal);
+    }
+
+    function formatarCampoMoeda(el) {
+        let value = el.value.replace(/\D/g, '');
+        if(!value) return;
+        value = (value / 100).toFixed(2) + '';
+        value = value.replace(".", ",");
+        value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        el.value = 'R$ ' + value;
+    }
+
+    document.querySelectorAll('.mask-money').forEach(input => {
+        input.addEventListener('input', (e) => formatarCampoMoeda(e.target));
+    });
+
+    function parseMoney(str) {
+        if (!str) return 0;
+        let clean = str.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
+        return parseFloat(clean) || 0;
+    }
+
+    function formatMoeda(val) {
+        return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcularINSS(base) {
+        let imposto = 0;
+        let baseRestante = base;
+        let limiteAnterior = 0;
+
+        for (let i = 0; i < tabelaINSS.length; i++) {
+            if (baseRestante <= 0) break;
+            let larguraFaixa = tabelaINSS[i].limite - limiteAnterior;
+            let valorNaFaixa = Math.min(baseRestante, larguraFaixa);
+            imposto += valorNaFaixa * tabelaINSS[i].aliquota;
+            baseRestante -= valorNaFaixa;
+            limiteAnterior = tabelaINSS[i].limite;
+        }
+        return Math.min(imposto, tetoINSS);
+    }
+
+    function calcularIRRF(base, rendimentoBruto) {
+        let impostoBase = 0;
+        for (let i = 0; i < tabelaIRRF.length; i++) {
+            if (base <= tabelaIRRF[i].limite) {
+                impostoBase = (base * tabelaIRRF[i].aliquota) - tabelaIRRF[i].deducao;
+                break;
+            }
+        }
+        if (impostoBase > 0 && rendimentoBruto > 0) {
+            impostoBase += (rendimentoBruto * acrescimoBrutoIRRF);
+        }
+        return Math.max(0, impostoBase);
+    }
+
+    async function executarCalculosGlobais() {
+        const dataInicioStr = document.getElementById('dataInicio').value;
+        if (!dataInicioStr) {
+            alert("Preencha a data de início!");
+            return;
+        }
+
+        // Recarrega dinamicamente as tabelas com base no mês do gozo selecionado
+        await carregarTabelasTributarias(dataInicioStr);
+
+        const empresa = document.getElementById('empresa').value;
+        const empregado = document.getElementById('empregado').value;
+        const matricula = document.getElementById('matricula').value;
+        
+        const salario = parseMoney(document.getElementById('salario').value);
+        const adicionais = parseMoney(document.getElementById('adicionais').value);
+        const mediaFerias = parseMoney(document.getElementById('mediaFerias').value);
+        const faltas = parseInt(document.getElementById('faltas').value) || 0;
+        
+        let diasGozo = parseInt(document.getElementById('diasGozo').value) || 30;
+        const temAbono = document.getElementById('abono').checked;
+        const tem13 = document.getElementById('adiantamento13').checked;
+
+        let diasDireitoMaximo = 30;
+        if (faltas > 5 && faltas <= 14) diasDireitoMaximo = 24;
+        else if (faltas > 14 && faltas <= 22) diasDireitoMaximo = 18;
+        else if (faltas > 22 && faltas <= 32) diasDireitoMaximo = 12;
+        else if (faltas > 32) diasDireitoMaximo = 0;
+
+        if (diasGozo > diasDireitoMaximo) {
+            alert(`Aviso: Limite de gozo reduzido para ${diasDireitoMaximo} dias em razão das ${faltas} faltas.`);
+            diasGozo = diasDireitoMaximo;
+            document.getElementById('diasGozo').value = diasDireitoMaximo;
+        }
+
+        if (temAbono && diasGozo > 20) {
+            diasGozo = 20;
+            document.getElementById('diasGozo').value = 20;
+        }
+
+        const baseRemuneracaoFf = salario + adicionais + mediaFerias;
+        const valorFeriasGozo = (baseRemuneracaoFf / 30) * diasGozo;
+        const tercoConstitucional = valorFeriasGozo / 3;
+
+        let valorAbono = 0;
+        let tercoAbono = 0;
+        if (temAbono) {
+            valorAbono = (baseRemuneracaoFf / 30) * 10;
+            tercoAbono = valorAbono / 3;
+        }
+
+        let valor13 = tem13 ? (salario * 0.5) : 0;
+
+        const baseTributavelRecibo = valorFeriasGozo + tercoConstitucional;
+        const inssRecibo = calcularINSS(baseTributavelRecibo);
+        const irrfRecibo = calcularIRRF(baseTributavelRecibo - inssRecibo, baseTributavelRecibo);
+
+        const brutoRecibo = valorFeriasGozo + tercoConstitucional + valorAbono + tercoAbono + valor13;
+        const descontosRecibo = inssRecibo + irrfRecibo;
+        const liquidoRecibo = brutoRecibo - descontosRecibo;
+
+        const rateioFolhas = calcularImpactoFolha(dataInicioStr, diasGozo, baseRemuneracaoFf, salario + adicionais);
+
+        renderizarPainelResultados(valorFeriasGozo, diasGozo, tercoConstitucional, valorAbono, tercoAbono, valor13, inssRecibo, irrfRecibo, brutoRecibo, descontosRecibo, liquidoRecibo, rateioFolhas);
+        preencherDadosImpressao(empresa, empregado, matricula, dataInicioStr, diasGozo, valorFeriasGozo, tercoConstitucional, valorAbono, tercoAbono, valor13, inssRecibo, irrfRecibo, brutoRecibo, descontosRecibo, liquidoRecibo, rateioFolhas);
+    }
+
+    function calcularImpactoFolha(dataInicioStr, diasGozo, baseRemuneracaoFf, salarioMensalFixo) {
+        const partes = dataInicioStr.split('-');
+        let dataCorrente = new Date(partes[0], partes[1] - 1, partes[2]);
+        let distribuicao = {};
+
+        for (let i = 0; i < diasGozo; i++) {
+            let compKey = `${String(dataCorrente.getMonth() + 1).padStart(2, '0')}/${dataCorrente.getFullYear()}`;
+            distribuicao[compKey] = (distribuicao[compKey] || 0) + 1;
+            dataCorrente.setDate(dataCorrente.getDate() + 1);
+        }
+
+        let resultado = [];
+        for (let comp in distribuicao) {
+            let diasFfMes = distribuicao[comp];
+            let diasTrabalhadosMes = Math.max(0, 30 - diasFfMes);
+
+            let verbaSalarioEfetivo = (salarioMensalFixo / 30) * diasTrabalhadosMes;
+            let verbaFeriasProporcional = (baseRemuneracaoFf / 30) * diasFfMes;
+            let verbaTercoProporcional = verbaFeriasProporcional / 3;
+
+            let baseTributavelFolha = verbaSalarioEfetivo + verbaFeriasProporcional + verbaTercoProporcional;
+            let inssFolha = calcularINSS(baseTributavelFolha);
+            let irrfFolha = calcularIRRF(baseTributavelFolha - inssFolha, baseTributavelFolha);
+
+            resultado.push({
+                competencia: comp,
+                diasTrab: diasTrabalhadosMes,
+                diasFf: diasFfMes,
+                salario: verbaSalarioEfetivo,
+                ferias: verbaFeriasProporcional,
+                terco: verbaTercoProporcional,
+                bruto: baseTributavelFolha,
+                inss: inssFolha,
+                irrf: irrfFolha,
+                // Como as férias constam em proventos e descontos simultaneamente, elas se anulam no saldo líquido
+                liquido: verbaSalarioEfetivo - (inssFolha + irrfFolha)
+            });
+        }
+        return resultado;
+    }
+
+    function renderizarPainelResultados(vf, df, tf, va, ta, v13, inss, irrf, brute, desc, liq, rateio) {
+        const div = document.getElementById('dashboardResultados');
+        let html = `
+            <div class="section-sub">1. Composição do Recibo de Férias — Ref: ${mesReferenciaGlobal}</div>
+            <table class="res-table">
+                <thead><tr><th>Evento Calculado</th><th>Base Legal</th><th class="text-right">Proventos</th><th class="text-right">Descontos</th></tr></thead>
+                <tbody>
+                    <tr><td>Férias Regulamentares, Médias e Adicionais (${df} dias)</td><td><span class="legal-ref">Art. 129 CLT</span></td><td class="text-right val-prov">${formatMoeda(vf)}</td><td class="text-right">-</td></tr>
+                    <tr><td>1/3 Constitucional de Férias</td><td><span class="legal-ref">Art. 7º, XVII CF</span></td><td class="text-right val-prov">${formatMoeda(tf)}</td><td class="text-right">-</td></tr>
+        `;
+
+        if (va > 0) {
+            html += `
+                <tr><td>Abono Pecuniário (10 dias)</td><td><span class="legal-ref">Art. 143 CLT</span></td><td class="text-right val-prov">${formatMoeda(va)}</td><td class="text-right">-</td></tr>
+                <tr><td>1/3 Constitucional s/ Abono</td><td><span class="legal-ref">Art. 143 §1º CLT</span></td><td class="text-right val-prov">${formatMoeda(ta)}</td><td class="text-right">-</td></tr>
+            `;
+        }
+        if (v13 > 0) {
+            html += `<tr><td>Adiantamento 1ª Parcela 13º</td><td><span class="legal-ref">Lei 4.090/62</span></td><td class="text-right val-prov">${formatMoeda(v13)}</td><td class="text-right">-</td></tr>`;
+        }
+
+        html += `
+                    <tr><td>Dedução INSS Férias</td><td><span class="legal-ref">Tabela Progressiva</span></td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(inss)}</td></tr>
+                    <tr><td>Retenção IRRF Férias</td><td><span class="legal-ref">Tabela Progressiva</span></td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(irrf)}</td></tr>
+                    <tr class="row-total"><td>Totais do Recibo</td><td>-</td><td class="text-right val-prov">${formatMoeda(brute)}</td><td class="text-right val-desc">${formatMoeda(desc)}</td></tr>
+                    <tr class="row-total" style="background:#e2e8f0;"><td>LÍQUIDO DO RECIBO (Pagar até 2 dias antes)</td><td><span class="legal-ref">Art. 145 CLT</span></td><td colspan="2" class="text-right" style="color:var(--primary); font-size:1.1rem;">${formatMoeda(liq)}</td></tr>
+                </tbody>
+            </table>
+
+            <div class="section-sub">2. Resumos de Impacto e Encargos na Folha Mensal</div>
+        `;
+
+        rateio.forEach(item => {
+            html += `
+                <div class="folha-box">
+                    <div class="folha-title">Mês/Ano Competência: ${item.competencia} (Tabela Ref: ${mesReferenciaGlobal})</div>
+                    <table class="res-table" style="margin-bottom:0;">
+                        <thead><tr><th>Componente da Folha</th><th>Fração / Ref.</th><th class="text-right">Proventos</th><th class="text-right">Descontos</th></tr></thead>
+                        <tbody>
+                            <tr><td>Saldo de Salário Efetivo</td><td>${item.diasTrab} dias</td><td class="text-right">${formatMoeda(item.salario)}</td><td class="text-right">-</td></tr>
+                            
+                            <tr><td>Férias Gozadas, Médias e Adicionais (Base)</td><td>${item.diasFf} dias</td><td class="text-right val-prov">${formatMoeda(item.ferias)}</td><td class="text-right val-desc">${formatMoeda(item.ferias)}</td></tr>
+                            <tr><td>1/3 Constitucional de Férias (Base)</td><td>Pro-rata</td><td class="text-right val-prov">${formatMoeda(item.terco)}</td><td class="text-right val-desc">${formatMoeda(item.terco)}</td></tr>
+                            
+                            <tr><td>(-) Retenção INSS da Competência</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(item.inss)}</td></tr>
+                            <tr><td>(-) Retenção IRRF da Competência</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(item.irrf)}</td></tr>
+                            <tr class="row-total" style="background:#fff;"><td style="color:var(--secondary)">Líquido Efetivo no Contracheque</td><td>-</td><td colspan="2" class="text-right" style="color:var(--secondary); font-size:1rem;">${formatMoeda(item.liquido)}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        });
+
+        div.innerHTML = html;
+    }
+
+    function preencherDadosImpressao(emp, empNome, mat, datInic, df, vf, tf, va, ta, v13, inss, irrf, brute, desc, liq, rateio) {
+        document.getElementById('pCompany').innerText = emp;
+        document.getElementById('pMatricula').innerText = mat;
+        document.getElementById('pEmployee').innerText = empNome;
+        document.getElementById('pMatriculaFolha').innerText = mat;
+        document.getElementById('pEmployeeFolha').innerText = empNome;
+        document.getElementById('pDias').innerText = df;
+
+        const partes = datInic.split('-');
+        let dInicObj = new Date(partes[0], partes[1] - 1, partes[2]);
+        document.getElementById('pDataInic').innerText = dInicObj.toLocaleDateString('pt-BR');
+        
+        let dFimObj = new Date(dInicObj);
+        dFimObj.setDate(dFimObj.getDate() + (df - 1));
+        document.getElementById('pDataFim').innerText = dFimObj.toLocaleDateString('pt-BR');
+
+        let tbody = document.querySelector('#tableReciboImp tbody');
+        let lines = `
+            <tr><td>Férias Regulamentares, Médias e Adicionais</td><td>Art. 129 CLT</td><td class="text-right">${formatMoeda(vf)}</td><td class="text-right">-</td></tr>
+            <tr><td>1/3 Constitucional de Férias</td><td>Art. 7º, XVII CF</td><td class="text-right">${formatMoeda(tf)}</td><td class="text-right">-</td></tr>
+        `;
+        if (va > 0) {
+            lines += `
+                <tr><td>Abono Pecuniário</td><td>Art. 143 CLT</td><td class="text-right">${formatMoeda(va)}</td><td class="text-right">-</td></tr>
+                <tr><td>1/3 Constitucional sobre Abono</td><td>Art. 143 §1º CLT</td><td class="text-right">${formatMoeda(ta)}</td><td class="text-right">-</td></tr>
+            `;
+        }
+        if (v13 > 0) {
+            lines += `<tr><td>Antecipação de Primeira Parcela de 13º</td><td>Lei 4.090/62</td><td class="text-right">${formatMoeda(v13)}</td><td class="text-right">-</td></tr>`;
+        }
+        lines += `
+            <tr><td>Contribuição Previdenciária (INSS)</td><td>Tabela Progressiva</td><td class="text-right">-</td><td class="text-right">${formatMoeda(inss)}</td></tr>
+            <tr><td>Imposto de Renda Retido na Fonte (IRRF)</td><td>Tabela Progressiva</td><td class="text-right">-</td><td class="text-right">${formatMoeda(irrf)}</td></tr>
+            <tr style="font-weight:bold;"><td>TOTAIS DO DEMONSTRATIVO</td><td>-</td><td class="text-right">${formatMoeda(brute)}</td><td class="text-right">${formatMoeda(desc)}</td></tr>
+            <tr style="font-weight:bold; background-color:#eaeaea;"><td>VALOR LÍQUIDO A RECEBER</td><td>Art. 145 CLT</td><td colspan="2" class="text-right">${formatMoeda(liq)}</td></tr>
+        `;
+        tbody.innerHTML = lines;
+
+        let folhaDiv = document.getElementById('folhaCompetenciasImp');
+        let folhaHtml = "";
+        rateio.forEach(item => {
+            folhaHtml += `
+                <div style="margin-top:15px; page-break-inside: avoid;">
+                    <h4 style="border-bottom:1px solid #000; padding-bottom:2px;">Competência Mensal: ${item.competencia} (Tabela Ref: ${mesReferenciaGlobal})</h4>
+                    <table class="imp-table">
+                        <thead><tr><th>Item da Folha</th><th>Dias/Referência</th><th style="text-align:right;">Proventos</th><th style="text-align:right;">Descontos</th></tr></thead>
+                        <tbody>
+                            <tr><td>Saldo de Salário (Período Trabalhado)</td><td>${item.diasTrab} dias</td><td class="text-right">${formatMoeda(item.salario)}</td><td class="text-right">-</td></tr>
+                            
+                            <tr><td>Férias Regulamentares, Médias e Adicionais (Composição de Base)</td><td>${item.diasFf} dias</td><td class="text-right">${formatMoeda(item.ferias)}</td><td class="text-right">${formatMoeda(item.ferias)}</td></tr>
+                            <tr><td>1/3 Constitucional de Férias Proporcional (Composição de Base)</td><td>Pro-rata</td><td class="text-right">${formatMoeda(item.terco)}</td><td class="text-right">${formatMoeda(item.terco)}</td></tr>
+                            
+                            <tr><td>Débito de Contribuição Previdenciária (INSS)</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right">${formatMoeda(item.inss)}</td></tr>
+                            <tr><td>Débito de Imposto de Renda (IRRF)</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right">${formatMoeda(item.irrf)}</td></tr>
+                            <tr style="font-weight:bold; background-color:#eaeaea;"><td>SALDO LÍQUIDO DO CONTRACHEQUE NO MÊS</td><td>-</td><td colspan="2" class="text-right">${formatMoeda(item.liquido)}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        });
+        folhaDiv.innerHTML = folhaHtml;
+    }
+
+    window.onload = async () => {
+        await carregarTabelasTributarias();
+        executarCalculosGlobais();
+    };
+</script>
+
+</body>
+</html>
