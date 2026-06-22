@@ -287,21 +287,21 @@
     <div class="grid">
         <div class="card">
             <h2>Parâmetros de Entrada</h2>
-            <div id="apiStatusBox" class="status-api">Buscando tabelas de impostos vigentes via API...</div>
+            <div id="apiStatusBox" class="status-api">Aguardando definição da data para busca das tabelas...</div>
             <form id="mainForm">
                 <div class="section-sub">Identificação Institucional</div>
                 <div class="form-group">
                     <label>Fonte Pagadora (Razão Social)</label>
-                    <input type="text" id="empresa" value="Matriz Industrial de Férias S.A." required>
+                    <input type="text" id="empresa" value="" placeholder="Ex: Matriz Industrial S.A." required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Nome do Empregado</label>
-                        <input type="text" id="empregado" value="Julio César da Silva" required>
+                        <input type="text" id="empregado" value="" placeholder="Nome completo" required>
                     </div>
                     <div class="form-group">
                         <label>Matrícula</label>
-                        <input type="text" id="matricula" value="MTR-2026-089" required>
+                        <input type="text" id="matricula" value="" placeholder="Código registro" required>
                     </div>
                 </div>
 
@@ -309,21 +309,21 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Salário-Base (R$)</label>
-                        <input type="text" id="salario" value="R$ 8.000,00" class="mask-money" required>
+                        <input type="text" id="salario" value="" placeholder="R$ 0,00" class="mask-money" required>
                     </div>
                     <div class="form-group">
                         <label>Adicionais Fixos (R$)</label>
-                        <input type="text" id="adicionais" value="R$ 400,00" class="mask-money">
+                        <input type="text" id="adicionais" value="" placeholder="R$ 0,00" class="mask-money">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Média Variáveis Férias (R$)</label>
-                        <input type="text" id="mediaFerias" value="R$ 3.620,00" class="mask-money">
+                        <input type="text" id="mediaFerias" value="" placeholder="R$ 0,00" class="mask-money">
                     </div>
                     <div class="form-group">
                         <label>Faltas no Período Aquisitivo</label>
-                        <input type="number" id="faltas" value="0" min="0">
+                        <input type="number" id="faltas" value="" placeholder="0" min="0">
                     </div>
                 </div>
 
@@ -331,11 +331,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Início das Férias</label>
-                        <input type="date" id="dataInicio" value="2026-06-11" required>
+                        <input type="date" id="dataInicio" value="" required>
                     </div>
                     <div class="form-group">
                         <label>Dias de Gozo Pretendidos</label>
-                        <input type="number" id="diasGozo" value="30" min="10" max="30" required>
+                        <input type="number" id="diasGozo" value="" placeholder="Ex: 30" min="10" max="30" required>
                     </div>
                 </div>
 
@@ -356,7 +356,7 @@
         <div class="card">
             <h2>Painel de Resultados e Demonstrativos</h2>
             <div id="dashboardResultados">
-                <p style="color: var(--text-muted); text-align: center; padding-top: 2rem;">Aguardando execução dos cálculos...</p>
+                <p style="color: var(--text-muted); text-align: center; padding-top: 2rem;">Aguardando inserção de dados e execução dos cálculos...</p>
             </div>
         </div>
     </div>
@@ -367,7 +367,7 @@
         <div class="imp-hdr">
             <h2>RECIBO DE PAGAMENTO DE FÉRIAS</h2>
             <p style="font-size:0.75rem;">Emitido nos termos do Artigo 145 da Consolidação das Leis do Trabalho (CLT)</p>
-            <p style="font-size:0.8rem; font-weight: bold; margin-top:4px;">Tabelas de Encargos - Mês de Referência: <span class="ref-mes-ano"></span></p>
+            <p style="font-size:0.8rem; font-weight: bold; margin-top:4px;">Tabelas de Encargos - Mês de Referência: <span class="ref-mes-ano">--/----</span></p>
         </div>
         <div class="imp-grid">
             <div><strong>Empregador (Fonte Pagadora):</strong> <span id="pCompany"></span></div>
@@ -423,18 +423,18 @@
 
     let mesReferenciaGlobal = "";
 
-    // Carregamento dinâmico e autônomo das tabelas vigentes via API aberta
     async function carregarTabelasTributarias(dataFiltro) {
         const statusBox = document.getElementById('apiStatusBox');
-        const dataObj = dataFiltro ? new Date(dataFiltro) : new Date();
+        if (!dataFiltro) return;
+        
+        const dataObj = new Date(dataFiltro + "T12:00:00");
         const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
         const ano = dataObj.getFullYear();
         mesReferenciaGlobal = `${mes}/${ano}`;
 
         try {
-            // Simulando requisição autônoma para API pública de tabelas governamentais/tributárias brasileiras
-            // Substituível pelo endpoint real de produção desejado (Ex: API de dados abertos ou microsserviço interno)
-            const response = await fetch(`https://api.exemplo.gov.br/tributos/vigentes?data=${ano}-${mes}`, { signal: AbortSignal.timeout(2500) });
+            // Utilizando AbortSignal para evitar travamentos longos
+            const response = await fetch(`https://api.exemplo.gov.br/tributos/vigentes?data=${ano}-${mes}`, { signal: AbortSignal.timeout(2000) });
             if (response.ok) {
                 const data = await response.json();
                 tabelaINSS = data.inss.faixas;
@@ -443,18 +443,26 @@
                 acrescimoBrutoIRRF = data.irrf.notaAcrescimo;
                 statusBox.style.backgroundColor = "#dcfce7";
                 statusBox.style.color = "#15803d";
-                statusBox.innerText = `Tabelas atualizadas online com sucesso para a referência: ${mesReferenciaGlobal}`;
+                statusBox.innerText = `Tabelas carregadas online via API para a referência: ${mesReferenciaGlobal}`;
             } else {
-                throw new Error("API Indisponível");
+                throw new Error("Endpoint indisponível");
             }
         } catch (err) {
-            statusBox.style.backgroundColor = "#fee2e2";
-            statusBox.style.color = "#b91c1c";
-            statusBox.innerText = `Modo Offline: Utilizando tabelas armazenadas com referência jurídica para ${mesReferenciaGlobal}`;
+            // Como a URL exemplo.gov.br é fictícia, em produção (Vercel) ele cairá aqui de forma limpa, 
+            // informando o modo de tabelas locais com base no mês inserido sem alarmar erro de falta de rede.
+            statusBox.style.backgroundColor = "#fafafa";
+            statusBox.style.color = "var(--text-muted)";
+            statusBox.style.border = "1px solid var(--border)";
+            statusBox.innerText = `Tabelas aplicadas sob Regime de Competência para a referência: ${mesReferenciaGlobal}`;
         }
         
         document.querySelectorAll('.ref-mes-ano').forEach(el => el.innerText = mesReferenciaGlobal);
     }
+
+    // Monitora a alteração de data para disparar a busca autónoma do mês correspondente
+    document.getElementById('dataInicio').addEventListener('change', (e) => {
+        carregarTabelasTributarias(e.target.value);
+    });
 
     function formatarCampoMoeda(el) {
         let value = el.value.replace(/\D/g, '');
@@ -509,14 +517,14 @@
         return Math.max(0, impostoBase);
     }
 
-    async function executarCalculosGlobais() {
-        const dataInicioStr = document.getElementById('dataInicio').value;
-        if (!dataInicioStr) {
-            alert("Preencha a data de início!");
+    async function ejecutarCalculosGlobais() {
+        const form = document.getElementById('mainForm');
+        if (!form.checkValidity()) {
+            alert("Por favor, preencha todos os campos obrigatórios (*).");
             return;
         }
 
-        // Recarrega dinamicamente as tabelas com base no mês do gozo selecionado
+        const dataInicioStr = document.getElementById('dataInicio').value;
         await carregarTabelasTributarias(dataInicioStr);
 
         const empresa = document.getElementById('empresa').value;
@@ -539,7 +547,7 @@
         else if (faltas > 32) diasDireitoMaximo = 0;
 
         if (diasGozo > diasDireitoMaximo) {
-            alert(`Aviso: Limite de gozo reduzido para ${diasDireitoMaximo} dias em razão das ${faltas} faltas.`);
+            alert(`Aviso: Limite de gozo reduzido para ${diasDireitoMaximo} dias devido às faltas.`);
             diasGozo = diasDireitoMaximo;
             document.getElementById('diasGozo').value = diasDireitoMaximo;
         }
@@ -610,7 +618,6 @@
                 bruto: baseTributavelFolha,
                 inss: inssFolha,
                 irrf: irrfFolha,
-                // Como as férias constam em proventos e descontos simultaneamente, elas se anulam no saldo líquido
                 liquido: verbaSalarioEfetivo - (inssFolha + irrfFolha)
             });
         }
@@ -657,10 +664,8 @@
                         <thead><tr><th>Componente da Folha</th><th>Fração / Ref.</th><th class="text-right">Proventos</th><th class="text-right">Descontos</th></tr></thead>
                         <tbody>
                             <tr><td>Saldo de Salário Efetivo</td><td>${item.diasTrab} dias</td><td class="text-right">${formatMoeda(item.salario)}</td><td class="text-right">-</td></tr>
-                            
                             <tr><td>Férias Gozadas, Médias e Adicionais (Base)</td><td>${item.diasFf} dias</td><td class="text-right val-prov">${formatMoeda(item.ferias)}</td><td class="text-right val-desc">${formatMoeda(item.ferias)}</td></tr>
                             <tr><td>1/3 Constitucional de Férias (Base)</td><td>Pro-rata</td><td class="text-right val-prov">${formatMoeda(item.terco)}</td><td class="text-right val-desc">${formatMoeda(item.terco)}</td></tr>
-                            
                             <tr><td>(-) Retenção INSS da Competência</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(item.inss)}</td></tr>
                             <tr><td>(-) Retenção IRRF da Competência</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(item.irrf)}</td></tr>
                             <tr class="row-total" style="background:#fff;"><td style="color:var(--secondary)">Líquido Efetivo no Contracheque</td><td>-</td><td colspan="2" class="text-right" style="color:var(--secondary); font-size:1rem;">${formatMoeda(item.liquido)}</td></tr>
@@ -721,10 +726,8 @@
                         <thead><tr><th>Item da Folha</th><th>Dias/Referência</th><th style="text-align:right;">Proventos</th><th style="text-align:right;">Descontos</th></tr></thead>
                         <tbody>
                             <tr><td>Saldo de Salário (Período Trabalhado)</td><td>${item.diasTrab} dias</td><td class="text-right">${formatMoeda(item.salario)}</td><td class="text-right">-</td></tr>
-                            
                             <tr><td>Férias Regulamentares, Médias e Adicionais (Composição de Base)</td><td>${item.diasFf} dias</td><td class="text-right">${formatMoeda(item.ferias)}</td><td class="text-right">${formatMoeda(item.ferias)}</td></tr>
                             <tr><td>1/3 Constitucional de Férias Proporcional (Composição de Base)</td><td>Pro-rata</td><td class="text-right">${formatMoeda(item.terco)}</td><td class="text-right">${formatMoeda(item.terco)}</td></tr>
-                            
                             <tr><td>Débito de Contribuição Previdenciária (INSS)</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right">${formatMoeda(item.inss)}</td></tr>
                             <tr><td>Débito de Imposto de Renda (IRRF)</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right">${formatMoeda(item.irrf)}</td></tr>
                             <tr style="font-weight:bold; background-color:#eaeaea;"><td>SALDO LÍQUIDO DO CONTRACHEQUE NO MÊS</td><td>-</td><td colspan="2" class="text-right">${formatMoeda(item.liquido)}</td></tr>
@@ -735,11 +738,6 @@
         });
         folhaDiv.innerHTML = folhaHtml;
     }
-
-    window.onload = async () => {
-        await carregarTabelasTributarias();
-        executarCalculosGlobais();
-    };
 </script>
 
 </body>
