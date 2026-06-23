@@ -1,744 +1,1308 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Avançado de Férias e Provisão de Folha — CLT</title>
+    <title>Sistema de Férias e Provisão de Folha — CLT 2026</title>
     <style>
+        /* ===== TEMAS ===== */
         :root {
             --primary: #1e3a8a;
+            --primary-light: #3b5fc0;
             --primary-hover: #1e40af;
             --secondary: #0d9488;
+            --secondary-light: #14b8a8;
             --background: #f1f5f9;
             --surface: #ffffff;
+            --surface-2: #f8fafc;
+            --surface-3: #f1f5f9;
             --text-main: #0f172a;
             --text-muted: #475569;
+            --text-light: #94a3b8;
             --border: #cbd5e1;
+            --border-light: #e2e8f0;
             --danger: #dc2626;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --danger-bg: #fee2e2;
+            --success: #15803d;
+            --success-bg: #dcfce7;
+            --info: #0284c7;
+            --info-bg: #e0f2fe;
+            --shadow: 0 4px 6px -1px rgb(0 0 0/.1),0 2px 4px -2px rgb(0 0 0/.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0/.1),0 4px 6px -4px rgb(0 0 0/.1);
+            --radius: 12px;
+            --radius-sm: 7px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+        [data-theme="dark"] {
+            --primary: #7aacf5;
+            --primary-light: #93c0f8;
+            --primary-hover: #5d96f0;
+            --secondary: #2dd4bf;
+            --secondary-light: #5eead4;
+            --background: #0c1324;
+            --surface: #172035;
+            --surface-2: #1e2c45;
+            --surface-3: #1a2740;
+            --text-main: #e8f0fe;
+            --text-muted: #94a3b8;
+            --text-light: #64748b;
+            --border: #2d3f5e;
+            --border-light: #243352;
+            --danger: #f87171;
+            --danger-bg: #3b0d0d;
+            --success: #4ade80;
+            --success-bg: #052e16;
+            --info: #38bdf8;
+            --info-bg: #0a2540;
+            --shadow: 0 4px 6px -1px rgb(0 0 0/.35),0 2px 4px -2px rgb(0 0 0/.3);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0/.45),0 4px 6px -4px rgb(0 0 0/.35);
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
 
         body {
-            background-color: var(--background);
+            background: var(--background);
             color: var(--text-main);
-            padding: 2rem 1rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background .3s, color .3s;
         }
 
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-        }
-
+        /* ===== HEADER ===== */
         header {
-            text-align: center;
-            margin-bottom: 2rem;
-            border-bottom: 4px solid var(--primary);
-            padding-bottom: 1rem;
+            background: linear-gradient(135deg,#1e3a8a 0%,#1e40af 55%,#0d9488 100%);
+            color: #fff;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 4px 24px rgba(30,58,138,.35);
         }
-
-        header h1 {
-            color: var(--primary);
-            font-size: 2rem;
+        [data-theme="dark"] header {
+            background: linear-gradient(135deg,#0c1324 0%,#172035 55%,#1a2740 100%);
+            box-shadow: 0 4px 24px rgba(0,0,0,.5);
         }
-
-        header p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
+        .header-inner {
+            max-width:1380px; margin:0 auto; padding:.95rem 1.5rem;
+            display:flex; align-items:center; justify-content:space-between; gap:1rem;
         }
+        .header-left { display:flex; align-items:center; gap:.9rem; }
+        .header-logo {
+            width:46px; height:46px; background:rgba(255,255,255,.15);
+            border-radius:12px; display:flex; align-items:center; justify-content:center;
+            font-size:1.5rem; border:1px solid rgba(255,255,255,.2); flex-shrink:0;
+        }
+        .header-text h1 { font-size:1.2rem; font-weight:800; letter-spacing:-.01em; line-height:1.2; }
+        .header-text p { font-size:.75rem; opacity:.8; margin-top:.15rem; }
+        .header-badges { display:flex; gap:.4rem; margin-top:.3rem; }
+        .badge {
+            background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.28);
+            padding:.1rem .55rem; border-radius:20px; font-size:.62rem; font-weight:700;
+            text-transform:uppercase; letter-spacing:.06em;
+        }
+        .theme-toggle {
+            background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3);
+            color:#fff; border-radius:50px; padding:.48rem 1.1rem; cursor:pointer;
+            font-size:.8rem; font-weight:700; display:flex; align-items:center; gap:.4rem;
+            transition:all .2s; white-space:nowrap; flex-shrink:0;
+        }
+        .theme-toggle:hover { background:rgba(255,255,255,.28); transform:scale(1.03); }
 
+        /* ===== LAYOUT ===== */
+        .container { max-width:1380px; margin:0 auto; padding:1.5rem 1.5rem 3rem; }
         .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
+            display:grid; grid-template-columns:1fr; gap:1.5rem;
+        }
+        @media(min-width:1060px){ .grid{ grid-template-columns:400px 1fr; } }
+
+        /* ===== CARDS ===== */
+        .card {
+            background:var(--surface); border-radius:var(--radius);
+            padding:1.6rem; box-shadow:var(--shadow);
+            border:1px solid var(--border-light); transition:background .3s,border .3s;
+        }
+        .card-header {
+            display:flex; align-items:center; gap:.75rem;
+            margin-bottom:1.4rem; padding-bottom:.9rem;
+            border-bottom:2px solid var(--border-light);
+        }
+        .card-icon {
+            width:40px; height:40px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0;
+        }
+        .ci-blue { background:#dbeafe; }
+        .ci-teal { background:#ccfbf1; }
+        [data-theme="dark"] .ci-blue { background:#1e3a8a33; }
+        [data-theme="dark"] .ci-teal { background:#0d948833; }
+        .card h2 { font-size:1.05rem; font-weight:800; color:var(--text-main); }
+        .card h2 span { display:block; font-size:.72rem; font-weight:400; color:var(--text-muted); margin-top:.1rem; }
+
+        /* ===== SECTION LABELS ===== */
+        .section-sub {
+            font-size:.7rem; font-weight:800; color:var(--primary);
+            margin:1.3rem 0 .8rem; text-transform:uppercase; letter-spacing:.08em;
+            display:flex; align-items:center; gap:.5rem;
+        }
+        .section-sub::after { content:''; flex:1; height:1px; background:var(--border-light); }
+
+        /* ===== FORM ===== */
+        .form-group { margin-bottom:.9rem; }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
+        label {
+            display:block; font-size:.72rem; font-weight:700;
+            margin-bottom:.3rem; color:var(--text-muted);
+            text-transform:uppercase; letter-spacing:.05em;
+        }
+        input[type="text"], input[type="number"], input[type="date"] {
+            width:100%; padding:.58rem .75rem;
+            border:1.5px solid var(--border); border-radius:var(--radius-sm);
+            font-size:.88rem; background:var(--surface-2); color:var(--text-main);
+            transition:border-color .2s,box-shadow .2s,background .3s;
+        }
+        input:focus {
+            outline:none; border-color:var(--primary);
+            background:var(--surface);
+            box-shadow:0 0 0 3px rgba(30,58,138,.14);
+        }
+        [data-theme="dark"] input:focus { box-shadow:0 0 0 3px rgba(122,172,245,.2); }
+
+        /* ===== CHECKBOXES ===== */
+        .checkbox-group { display:flex; flex-direction:column; gap:.55rem; margin-top:.25rem; }
+        .checkbox-inline {
+            display:flex; align-items:flex-start; gap:.65rem; cursor:pointer;
+            padding:.65rem .85rem; border:1.5px solid var(--border);
+            border-radius:var(--radius-sm); background:var(--surface-2);
+            transition:border-color .2s,background .2s;
+        }
+        .checkbox-inline:hover { border-color:var(--primary); background:var(--surface); }
+        .checkbox-inline input[type="checkbox"] {
+            width:15px; height:15px; accent-color:var(--primary); margin-top:2px; flex-shrink:0;
+        }
+        .check-title { font-size:.82rem; font-weight:700; color:var(--text-main); display:block; }
+        .check-desc { font-size:.72rem; color:var(--text-muted); display:block; margin-top:.1rem; }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            width:100%; padding:.78rem 1rem; border:none; border-radius:var(--radius-sm);
+            font-size:.88rem; font-weight:800; cursor:pointer; transition:all .2s;
+            display:flex; align-items:center; justify-content:center; gap:.5rem; letter-spacing:.01em;
+        }
+        .btn-primary {
+            background:linear-gradient(135deg,#1e40af,#1e3a8a);
+            color:#fff; box-shadow:0 4px 14px rgba(30,58,138,.35); margin-top:1.2rem;
+        }
+        .btn-primary:hover { background:linear-gradient(135deg,#2563eb,#1e40af); transform:translateY(-1px); box-shadow:0 6px 18px rgba(30,58,138,.45); }
+        .btn-primary:active { transform:translateY(0); }
+        .btn-secondary {
+            background:linear-gradient(135deg,#0d9488,#0b7a70);
+            color:#fff; box-shadow:0 4px 14px rgba(13,148,136,.3); margin-top:.6rem;
+        }
+        .btn-secondary:hover { background:linear-gradient(135deg,#0f9f93,#0d8a7f); transform:translateY(-1px); box-shadow:0 6px 18px rgba(13,148,136,.4); }
+
+        /* ===== API STATUS BOX ===== */
+        .status-api {
+            font-size:.8rem; padding:.75rem 1rem; border-radius:var(--radius-sm);
+            margin-bottom:1.2rem; display:flex; align-items:flex-start;
+            gap:.6rem; border:1.5px solid transparent; transition:all .3s;
+        }
+        .status-api.idle    { background:var(--surface-3); color:var(--text-muted); border-color:var(--border); }
+        .status-api.loading { background:var(--info-bg); color:var(--info); border-color:#7dd3fa; }
+        .status-api.success { background:var(--success-bg); color:var(--success); border-color:#86efac; }
+        .status-api.offline { background:var(--surface-3); color:var(--text-muted); border-color:var(--border); }
+        .status-icon { font-size:1.1rem; flex-shrink:0; line-height:1.3; }
+        .status-text { flex:1; }
+        .status-text strong { display:block; font-weight:800; font-size:.82rem; }
+        .status-text p { font-size:.76rem; margin-top:.1rem; opacity:.85; }
+
+        /* TIMER */
+        .api-timer {
+            margin-top:.35rem; font-size:.72rem; font-weight:700;
+            font-variant-numeric:tabular-nums; opacity:.8;
+            background:rgba(0,0,0,.06); padding:.2rem .5rem;
+            border-radius:4px; display:inline-block;
+        }
+        [data-theme="dark"] .api-timer { background:rgba(255,255,255,.07); }
+
+        /* SPINNER */
+        .spinner {
+            display:inline-block; width:13px; height:13px;
+            border:2.5px solid currentColor; border-top-color:transparent;
+            border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* ===== SUMMARY CARDS ===== */
+        .summary-grid {
+            display:grid; grid-template-columns:repeat(3,1fr);
+            gap:.65rem; margin-bottom:1.4rem;
+        }
+        .summary-card {
+            background:var(--surface-3); border:1.5px solid var(--border);
+            border-radius:var(--radius-sm); padding:.8rem; text-align:center;
+        }
+        .s-label { font-size:.62rem; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); font-weight:800; }
+        .s-value { font-size:.95rem; font-weight:800; color:var(--text-main); margin-top:.2rem; }
+        .sc-highlight { border-color:var(--primary); background:rgba(30,58,138,.06); }
+        .sc-highlight .s-value { color:var(--primary); font-size:1.05rem; }
+        [data-theme="dark"] .sc-highlight { background:rgba(122,172,245,.08); }
+        .sc-success .s-value { color:var(--secondary); }
+        .sc-danger .s-value { color:var(--danger); }
+
+        /* ===== TABLES ===== */
+        .res-table {
+            width:100%; border-collapse:collapse; margin-bottom:1.2rem; font-size:.82rem;
+        }
+        .res-table th, .res-table td { padding:.55rem .7rem; border-bottom:1px solid var(--border-light); text-align:left; }
+        .res-table th {
+            background:var(--surface-3); color:var(--text-muted);
+            font-weight:800; font-size:.68rem; text-transform:uppercase; letter-spacing:.05em;
+        }
+        .res-table tr:last-child td { border-bottom:none; }
+        .res-table tbody tr:hover { background:var(--surface-3); }
+        .text-right { text-align:right !important; }
+        .val-prov { color:var(--secondary); font-weight:700; }
+        .val-desc { color:var(--danger); font-weight:700; }
+        .row-total { font-weight:800 !important; background:var(--surface-3) !important; }
+
+        .legal-ref {
+            font-size:.67rem; color:var(--text-light); font-style:italic;
+            background:var(--surface-3); padding:.1rem .38rem; border-radius:4px;
+            display:inline-block; white-space:nowrap;
         }
 
-        @media (min-width: 1024px) {
-            .grid {
-                grid-template-columns: 1fr 1.4fr;
+        /* ===== FOLHA BOX ===== */
+        .folha-box {
+            background:var(--surface-3); border:1px solid var(--border);
+            border-radius:var(--radius-sm); padding:.9rem 1rem;
+            margin-bottom:.9rem; border-left:4px solid var(--secondary);
+        }
+        .folha-title {
+            font-weight:800; color:var(--secondary); margin-bottom:.7rem;
+            font-size:.85rem; display:flex; align-items:center; gap:.4rem;
+        }
+
+        /* ===== PLACEHOLDER ===== */
+        .placeholder-state { text-align:center; padding:3rem 2rem; color:var(--text-muted); }
+        .placeholder-icon { font-size:3rem; margin-bottom:1rem; opacity:.45; }
+        .placeholder-state p { font-size:.88rem; max-width:240px; margin:0 auto; line-height:1.55; }
+
+        /* ===== DETALHAMENTO DE VERBAS ===== */
+        .row-base-detalhe td {
+            background: var(--surface-2);
+            font-size: .78rem;
+            color: var(--text-muted);
+            border-bottom: 1px dashed var(--border-light) !important;
+        }
+        .row-subtotal-ferias td {
+            background: rgba(13,148,136,.06);
+            border-top: 1.5px solid var(--secondary) !important;
+            border-bottom: 1.5px solid var(--secondary) !important;
+        }
+        [data-theme="dark"] .row-subtotal-ferias td { background: rgba(45,212,191,.07); }
+        .val-prov-sub { color: var(--secondary); font-weight: 600; text-align:right; opacity:.82; }
+        .val-desc-sub { color: var(--danger);    font-weight: 600; text-align:right; opacity:.82; }
+        /* Linha de dedução do recibo (já retido) */
+        .row-retido-recibo td {
+            background: rgba(220,38,38,.04);
+            font-size: .78rem;
+            color: var(--text-muted);
+            border-bottom: 1px dashed var(--border-light) !important;
+            font-style: italic;
+        }
+        [data-theme="dark"] .row-retido-recibo td { background: rgba(248,113,113,.05); }
+        .val-desc-retido { color: var(--danger); font-weight: 600; text-align:right; opacity:.72; font-style:italic; }
+
+        /* ===== FORMULÁRIO COM BARRA DE ROLAGEM PRÓPRIA ===== */
+        @media(min-width:1060px) {
+            .card-form-scroll {
+                display: flex;
+                flex-direction: column;
+                max-height: calc(100vh - 90px);
+                overflow: hidden;
+            }
+            .card-form-scroll .form-scroll-body {
+                overflow-y: auto;
+                flex: 1;
+                padding-right: 6px;
             }
         }
 
-        .card {
-            background: var(--surface);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
+        /* ===== BARRAS DE ROLAGEM EM DESTAQUE ===== */
+        /* Formulário */
+        .form-scroll-body::-webkit-scrollbar { width: 10px; }
+        .form-scroll-body::-webkit-scrollbar-track {
+            background: var(--surface-3);
+            border-radius: 10px;
             border: 1px solid var(--border);
         }
-
-        .card h2 {
-            font-size: 1.2rem;
-            color: var(--primary);
-            margin-bottom: 1.2rem;
-            border-bottom: 2px solid var(--background);
-            padding-bottom: 0.4rem;
+        .form-scroll-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary-light), var(--primary));
+            border-radius: 10px;
+            border: 2px solid var(--surface-3);
+            box-shadow: inset 0 0 4px rgba(0,0,0,.25);
+        }
+        .form-scroll-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--primary-hover), var(--primary));
         }
 
-        .section-sub {
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: var(--secondary);
-            margin: 1rem 0 0.5rem 0;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="date"] {
-            width: 100%;
-            padding: 0.6rem;
+        /* Painel de resultados */
+        .results-scroll-body::-webkit-scrollbar { width: 10px; }
+        .results-scroll-body::-webkit-scrollbar-track {
+            background: var(--surface-3);
+            border-radius: 10px;
             border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 0.95rem;
-            background-color: #fafafa;
+        }
+        .results-scroll-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--secondary-light), var(--secondary));
+            border-radius: 10px;
+            border: 2px solid var(--surface-3);
+            box-shadow: inset 0 0 4px rgba(0,0,0,.25);
+        }
+        .results-scroll-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #0f9f93, var(--secondary));
         }
 
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background-color: #fff;
+        /* Firefox */
+        .form-scroll-body    { scrollbar-width: thin; scrollbar-color: var(--primary) var(--surface-3); }
+        .results-scroll-body { scrollbar-width: thin; scrollbar-color: var(--secondary) var(--surface-3); }
+
+        /* Painel de resultados com barra */
+        @media(min-width:1060px) {
+            .card-results-scroll {
+                display: flex;
+                flex-direction: column;
+                max-height: calc(100vh - 90px);
+                overflow: hidden;
+            }
+            .results-scroll-body {
+                overflow-y: auto;
+                flex: 1;
+                padding-right: 6px;
+            }
         }
 
-        .checkbox-inline {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        button {
-            width: 100%;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 1rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary);
-            color: white;
-            margin-top: 0.5rem;
-        }
-
-        .btn-secondary:hover {
-            background-color: #0b7a70;
-        }
-
-        .res-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1.5rem;
-            font-size: 0.88rem;
-        }
-
-        .res-table th, .res-table td {
-            padding: 0.6rem;
-            border-bottom: 1px solid var(--border);
-            text-align: left;
-        }
-
-        .res-table th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .text-right { text-align: right !important; }
-        .val-prov { color: var(--secondary); font-weight: 600; }
-        .val-desc { color: var(--danger); font-weight: 600; }
-        .row-total { font-weight: bold; background-color: #f8fafc; }
-        .legal-ref { font-size: 0.75rem; color: var(--text-muted); font-style: italic; display: block; }
-
-        .folha-box {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .folha-title {
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-            border-bottom: 1px dashed var(--border);
-            padding-bottom: 0.2rem;
-        }
-
-        .status-api {
-            font-size: 0.8rem;
-            color: #0284c7;
-            background: #e0f2fe;
-            padding: 0.4rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        #recibo-impressao { display: none; }
+        /* ===== PRINT / PDF ===== */
+        #recibo-impressao { display:none; }
 
         @media print {
-            body * { visibility: hidden; }
-            #recibo-impressao, #recibo-impressao * { visibility: visible; }
+            body * { visibility:hidden; }
+            #recibo-impressao, #recibo-impressao * { visibility:visible; }
             #recibo-impressao {
-                display: block;
-                position: absolute;
-                left: 0; top: 0; width: 100%;
-                color: #000; background: #fff;
-                padding: 10px;
+                display:block !important; position:absolute; left:0; top:0;
+                width:100%; background:#fff; color:#1a1a1a;
+                padding:18px 22px; font-family:'Segoe UI',Arial,sans-serif; font-size:8.5pt;
+            }
+            .print-master-header {
+                background:#1e3a8a !important; color:#fff !important;
+                -webkit-print-color-adjust:exact; print-color-adjust:exact;
+                padding:12px 18px; border-radius:7px 7px 0 0;
+                margin-bottom:0; display:flex; align-items:center; justify-content:space-between;
+            }
+            .print-master-header h2 { font-size:12pt; font-weight:900; }
+            .print-master-header .ph-sub { font-size:7pt; opacity:.88; margin-top:3px; }
+            .print-master-header .ph-ref {
+                background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3);
+                padding:4px 10px; border-radius:20px; font-size:7.5pt; font-weight:800;
+                white-space:nowrap;
             }
             .imp-block {
-                border: 2px solid #000;
-                padding: 15px;
-                margin-bottom: 25px;
-                border-radius: 4px;
-                page-break-inside: avoid;
+                border:1.5px solid #c7d4e8; padding:16px 20px; margin-bottom:22px;
+                border-radius:0 0 7px 7px; page-break-inside:avoid; background:#fff;
             }
-            .imp-hdr {
-                text-align: center;
-                border-bottom: 2px solid #000;
-                padding-bottom: 8px;
-                margin-bottom: 12px;
+            .imp-block:not(:first-child) {
+                border-radius:7px; margin-top:0;
             }
-            .imp-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 5px;
-                font-size: 0.85rem;
-                margin-bottom: 10px;
+            .imp-section-hdr {
+                display:flex; align-items:center; justify-content:space-between;
+                border-bottom:2px solid #1e3a8a; padding-bottom:8px; margin-bottom:12px;
             }
+            .imp-section-hdr h3 { color:#1e3a8a; font-size:9.5pt; font-weight:800; }
+            .imp-section-hdr .ref-pill {
+                background:#dbeafe; color:#1e3a8a; padding:3px 9px;
+                border-radius:20px; font-size:7pt; font-weight:800; border:1px solid #bfdbfe;
+            }
+            .imp-meta {
+                display:grid; grid-template-columns:1fr 1fr; gap:4px 14px;
+                font-size:8pt; margin-bottom:12px; background:#f8fafc;
+                padding:8px 11px; border-radius:5px; border:1px solid #e2e8f0;
+            }
+            .imp-meta .meta-label { color:#475569; font-weight:600; }
+            .imp-meta .meta-val { color:#0f172a; font-weight:700; }
             .imp-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-                font-size: 0.8rem;
+                width:100%; border-collapse:collapse; margin-top:6px; font-size:8pt;
             }
-            .imp-table th, .imp-table td {
-                border: 1px solid #000;
-                padding: 5px;
+            .imp-table thead th {
+                background:#1e3a8a !important; color:#fff !important;
+                -webkit-print-color-adjust:exact; print-color-adjust:exact;
+                padding:6px 8px; text-align:left; font-weight:800; font-size:7pt;
             }
-            .imp-table th { background-color: #f2f2f2 !important; }
+            .imp-table thead th:last-child,
+            .imp-table thead th:nth-last-child(2) { text-align:right; }
+            .imp-table td { border:1px solid #dce4f0; padding:5px 8px; }
+            .imp-table tbody tr:nth-child(even) td { background:#f8fafc; }
+            .imp-table .prov { color:#0d9488; font-weight:800; text-align:right; }
+            .imp-table .desc { color:#dc2626; font-weight:800; text-align:right; }
+            .imp-table .imp-sub-row td { background:#fafcff !important; color:#64748b; font-size:7.5pt; border-bottom:1px dashed #dce4f0 !important; }
+            .imp-table .prov-sub { color:#0d9488; font-weight:600; text-align:right; opacity:.82; }
+            .imp-table .desc-sub { color:#dc2626; font-weight:600; text-align:right; opacity:.72; font-style:italic; }
+            .imp-table .imp-subtotal-row td { background:#f0fdf4 !important; border-top:1.5px solid #0d9488 !important; border-bottom:1.5px solid #0d9488 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+            .imp-table .total-row td { background:#f1f5f9 !important; font-weight:800; border-top:1.5px solid #cbd5e1; }
+            .imp-table .liquido-row td {
+                background:#dbeafe !important; color:#1e3a8a !important; font-weight:900;
+                font-size:9pt; border-top:2px solid #1e3a8a;
+                -webkit-print-color-adjust:exact; print-color-adjust:exact;
+            }
             .sign-space {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 45px;
-                font-size: 0.8rem;
+                display:flex; justify-content:space-around; margin-top:30px; font-size:8pt; color:#334155;
             }
             .sign-line {
-                border-top: 1px solid #000;
-                width: 42%;
-                text-align: center;
-                padding-top: 3px;
+                border-top:1.5px solid #1e3a8a; width:38%; text-align:center;
+                padding-top:5px; color:#1e3a8a; font-weight:600;
             }
-            .page-break { page-break-before: always; }
+            .page-break { page-break-before:always; }
+            .folha-comp-header {
+                display:flex; align-items:center; gap:10px;
+                background:#f0fdf4 !important; border-left:4px solid #0d9488;
+                -webkit-print-color-adjust:exact; print-color-adjust:exact;
+                padding:7px 11px; border-radius:0 5px 5px 0; margin:14px 0 6px;
+            }
+            .folha-comp-header h4 { color:#0d9488; font-size:8.5pt; font-weight:800; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>Emissor Avançado de Recibo e Impacto em Folha</h1>
-        <p>Conformidade Estrita com a CLT & Atualização Dinâmica de Tabelas Oficiais</p>
-    </header>
+<header>
+    <div class="header-inner">
+        <div class="header-left">
+            <div class="header-logo">📋</div>
+            <div class="header-text">
+                <h1>Emissor de Recibo de Férias &amp; Impacto em Folha</h1>
+                <p>Conformidade estrita com a CLT · Tabelas INSS/IRRF 2026 · Regime de competência contábil</p>
+                <div class="header-badges">
+                    <span class="badge">CLT</span>
+                    <span class="badge">2026</span>
+                    <span class="badge">INSS/IRRF</span>
+                </div>
+            </div>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+            <span id="themeIcon">🌙</span>
+            <span id="themeLabel">Modo Escuro</span>
+        </button>
+    </div>
+</header>
 
+<div class="container">
     <div class="grid">
-        <div class="card">
-            <h2>Parâmetros de Entrada</h2>
-            <div id="apiStatusBox" class="status-api">Aguardando definição da data para busca das tabelas...</div>
-            <form id="mainForm">
-                <div class="section-sub">Identificação Institucional</div>
+        <!-- PAINEL DE ENTRADA -->
+        <div class="card card-form-scroll">
+            <div class="card-header">
+                <div class="card-icon ci-blue">📝</div>
+                <h2>Parâmetros de Entrada <span>Preencha todos os campos para calcular</span></h2>
+            </div>
+
+            <div class="form-scroll-body">
+            <div id="apiStatusBox" class="status-api idle">
+                <span class="status-icon">ℹ️</span>
+                <div class="status-text">
+                    <strong>Aguardando data de início</strong>
+                    <p>As tabelas INSS/IRRF serão carregadas ao definir a data das férias.</p>
+                </div>
+            </div>
+
+            <form id="mainForm" onsubmit="return false;">
+
+                <div class="section-sub">🏢 Identificação Institucional</div>
                 <div class="form-group">
                     <label>Fonte Pagadora (Razão Social)</label>
-                    <input type="text" id="empresa" value="" placeholder="Ex: Matriz Industrial S.A." required>
+                    <input type="text" id="empresa" placeholder="Ex: Matriz Industrial S.A." required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Nome do Empregado</label>
-                        <input type="text" id="empregado" value="" placeholder="Nome completo" required>
+                        <input type="text" id="empregado" placeholder="Nome completo" required>
                     </div>
                     <div class="form-group">
                         <label>Matrícula</label>
-                        <input type="text" id="matricula" value="" placeholder="Código registro" required>
+                        <input type="text" id="matricula" placeholder="Código" required>
                     </div>
                 </div>
 
-                <div class="section-sub">Bases Contratuais</div>
+                <div class="section-sub">💰 Bases Contratuais</div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Salário-Base (R$)</label>
-                        <input type="text" id="salario" value="" placeholder="R$ 0,00" class="mask-money" required>
+                        <input type="text" id="salario" placeholder="0,00" class="mask-money" required>
                     </div>
                     <div class="form-group">
                         <label>Adicionais Fixos (R$)</label>
-                        <input type="text" id="adicionais" value="" placeholder="R$ 0,00" class="mask-money">
+                        <input type="text" id="adicionais" placeholder="0,00" class="mask-money">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Média Variáveis Férias (R$)</label>
-                        <input type="text" id="mediaFerias" value="" placeholder="R$ 0,00" class="mask-money">
+                        <label>Médias Variáveis Férias (R$)</label>
+                        <input type="text" id="mediaFerias" placeholder="0,00" class="mask-money">
                     </div>
                     <div class="form-group">
-                        <label>Faltas no Período Aquisitivo</label>
-                        <input type="number" id="faltas" value="" placeholder="0" min="0">
+                        <label>Faltas no P. Aquisitivo</label>
+                        <input type="number" id="faltas" placeholder="0" min="0" value="0">
                     </div>
                 </div>
 
-                <div class="section-sub">Programação do Gozo</div>
+                <div class="section-sub">📅 Programação do Gozo</div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Início das Férias</label>
-                        <input type="date" id="dataInicio" value="" required>
+                        <input type="date" id="dataInicio" required>
                     </div>
                     <div class="form-group">
-                        <label>Dias de Gozo Pretendidos</label>
-                        <input type="number" id="diasGozo" value="" placeholder="Ex: 30" min="10" max="30" required>
+                        <label>Dias de Gozo</label>
+                        <input type="number" id="diasGozo" placeholder="30" min="5" max="30" required>
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="section-sub">📌 Opções Adicionais</div>
+                <div class="checkbox-group">
                     <label class="checkbox-inline">
-                        <input type="checkbox" id="abono"> Vender Abono Pecuniário (10 dias) - <em>Art. 143 da CLT</em>
+                        <input type="checkbox" id="abono">
+                        <div>
+                            <span class="check-title">Vender Abono Pecuniário (10 dias)</span>
+                            <span class="check-desc">Art. 143 CLT — reduz gozo para 20 dias</span>
+                        </div>
                     </label>
                     <label class="checkbox-inline">
-                        <input type="checkbox" id="adiantamento13"> Solicitar Adiantamento da 1ª Parcela do 13º Salário
+                        <input type="checkbox" id="adiantamento13">
+                        <div>
+                            <span class="check-title">Adiantamento da 1ª Parcela do 13º</span>
+                            <span class="check-desc">Lei 4.090/62 — 50% do salário nominal</span>
+                        </div>
                     </label>
                 </div>
 
-                <button type="button" class="btn-primary" onclick="executarCalculosGlobais()">Calcular e Atualizar</button>
-                <button type="button" class="btn-secondary" onclick="window.print()">Emitir Documentos (PDF)</button>
+                <button type="button" class="btn btn-primary" onclick="executarCalculosGlobais()">
+                    ⚡ Calcular e Gerar Demonstrativos
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="window.print()">
+                    🖨️ Emitir Documentos (PDF / Impressão)
+                </button>
+
             </form>
+            </div><!-- /form-scroll-body -->
         </div>
 
-        <div class="card">
-            <h2>Painel de Resultados e Demonstrativos</h2>
-            <div id="dashboardResultados">
-                <p style="color: var(--text-muted); text-align: center; padding-top: 2rem;">Aguardando inserção de dados e execução dos cálculos...</p>
+        <!-- PAINEL DE RESULTADOS -->
+        <div class="card card-results-scroll">
+            <div class="card-header">
+                <div class="card-icon ci-teal">📊</div>
+                <h2>Painel de Resultados <span>Demonstrativos de recibo e impacto em folha</span></h2>
             </div>
+            <div class="results-scroll-body">
+            <div id="dashboardResultados">
+                <div class="placeholder-state">
+                    <div class="placeholder-icon">📑</div>
+                    <p>Preencha os dados no painel à esquerda e clique em <strong>Calcular</strong> para visualizar os demonstrativos.</p>
+                </div>
+            </div>
+            </div><!-- /results-scroll-body -->
         </div>
     </div>
 </div>
 
+<!-- ======================================================
+     ÁREA DE IMPRESSÃO / PDF
+     ====================================================== -->
 <div id="recibo-impressao">
-    <div class="imp-block">
-        <div class="imp-hdr">
+
+    <!-- RECIBO -->
+    <div class="print-master-header">
+        <div>
             <h2>RECIBO DE PAGAMENTO DE FÉRIAS</h2>
-            <p style="font-size:0.75rem;">Emitido nos termos do Artigo 145 da Consolidação das Leis do Trabalho (CLT)</p>
-            <p style="font-size:0.8rem; font-weight: bold; margin-top:4px;">Tabelas de Encargos - Mês de Referência: <span class="ref-mes-ano">--/----</span></p>
+            <p class="ph-sub">Emitido nos termos do Art. 145 da Consolidação das Leis do Trabalho (CLT)</p>
         </div>
-        <div class="imp-grid">
-            <div><strong>Empregador (Fonte Pagadora):</strong> <span id="pCompany"></span></div>
-            <div><strong>Matrícula:</strong> <span id="pMatricula"></span></div>
-            <div style="grid-column: span 2;"><strong>Empregado:</strong> <span id="pEmployee"></span></div>
-            <div style="grid-column: span 2;"><strong>Período de Gozo:</strong> de <span id="pDataInic"></span> a <span id="pDataFim"></span> (<span id="pDias"></span> dias)</div>
+        <span class="ph-ref">Tabelas INSS/IRRF — Ref.: <span class="ref-mes-ano">--/----</span></span>
+    </div>
+
+    <div class="imp-block">
+        <div class="imp-section-hdr">
+            <h3>1. Dados do Período e Demonstrativo Financeiro</h3>
+            <span class="ref-pill">Ref. <span class="ref-mes-ano-b">--/----</span></span>
         </div>
+        <div class="imp-meta">
+            <div><span class="meta-label">Empregador (Fonte Pagadora):</span> <span class="meta-val" id="pCompany"></span></div>
+            <div><span class="meta-label">Matrícula:</span> <span class="meta-val" id="pMatricula"></span></div>
+            <div style="grid-column:span 2;"><span class="meta-label">Empregado:</span> <span class="meta-val" id="pEmployee"></span></div>
+            <div style="grid-column:span 2;"><span class="meta-label">Período de Gozo:</span> <span class="meta-val">De <span id="pDataInic"></span> a <span id="pDataFim"></span> (<span id="pDias"></span> dias)</span></div>
+        </div>
+
         <table class="imp-table" id="tableReciboImp">
             <thead>
-                <tr><th>Rúbrica / Descrição Evento</th><th>Ref. Legal</th><th style="text-align:right;">Proventos</th><th style="text-align:right;">Descontos</th></tr>
+                <tr>
+                    <th style="width:40%">Rúbrica / Descrição do Evento</th>
+                    <th style="width:22%">Referência Legal</th>
+                    <th style="width:19%; text-align:right">Proventos</th>
+                    <th style="width:19%; text-align:right">Descontos</th>
+                </tr>
             </thead>
             <tbody></tbody>
         </table>
+
         <div class="sign-space">
-            <div class="sign-line">Data: ____/____/_______</div>
+            <div class="sign-line">Local e Data: ________________________________</div>
             <div class="sign-line">Assinatura do Empregado</div>
         </div>
     </div>
 
     <div class="page-break"></div>
 
-    <div class="imp-block">
-        <div class="imp-hdr">
+    <!-- FOLHA -->
+    <div class="print-master-header">
+        <div>
             <h2>DEMONSTRATIVO DE INTEGRAÇÃO NA FOLHA DE PAGAMENTO</h2>
-            <p style="font-size:0.75rem;">Apropriação e rateio das competências em regime de competência contábil</p>
+            <p class="ph-sub">Apropriação e rateio por competência mensal em regime de competência contábil</p>
         </div>
-        <div class="imp-grid">
-            <div><strong>Empregado:</strong> <span id="pEmployeeFolha"></span></div>
-            <div><strong>Matrícula:</strong> <span id="pMatriculaFolha"></span></div>
+        <span class="ph-ref">Ref.: <span class="ref-mes-ano-c">--/----</span></span>
+    </div>
+
+    <div class="imp-block" style="border-radius:0 0 7px 7px;">
+        <div class="imp-section-hdr">
+            <h3>2. Rateio por Competência e Encargos na Folha</h3>
+            <span class="ref-pill">Regime de Competência</span>
+        </div>
+        <div class="imp-meta">
+            <div><span class="meta-label">Empregado:</span> <span class="meta-val" id="pEmployeeFolha"></span></div>
+            <div><span class="meta-label">Matrícula:</span> <span class="meta-val" id="pMatriculaFolha"></span></div>
         </div>
         <div id="folhaCompetenciasImp"></div>
     </div>
-</div>
+
+</div><!-- /recibo-impressao -->
 
 <script>
-    // Tabelas Locais para Fallback (Ano Referência: 2026)
-    let tabelaINSS = [
-        { limite: 1621.00, aliquota: 0.075 },
-        { limite: 2902.84, aliquota: 0.09 },
-        { limite: 4354.27, aliquota: 0.12 },
-        { limite: 8475.55, aliquota: 0.14 }
-    ];
-    let tetoINSS = 988.09;
+/* ====================================================
+   TABELAS LOCAIS — FALLBACK 2026
+   ==================================================== */
+let tabelaINSS = [
+    { limite: 1621.00,  aliquota: 0.075 },
+    { limite: 2902.84,  aliquota: 0.09  },
+    { limite: 4354.27,  aliquota: 0.12  },
+    { limite: 8475.55,  aliquota: 0.14  }
+];
+let tetoINSS = 988.09;
 
-    let tabelaIRRF = [
-        { limite: 2428.80, aliquota: 0.0, deducao: 0.0 },
-        { limite: 2826.65, aliquota: 0.075, deducao: 182.16 },
-        { limite: 3751.05, aliquota: 0.15, deducao: 394.16 },
-        { limite: 4664.68, aliquota: 0.225, deducao: 675.49 },
-        { limite: Infinity, aliquota: 0.275, deducao: 908.72 }
-    ];
-    let acrescimoBrutoIRRF = 0.00133145;
+let tabelaIRRF = [
+    { limite: 2428.80,    aliquota: 0.000, deducao:   0.00 },
+    { limite: 2826.65,    aliquota: 0.075, deducao: 182.16 },
+    { limite: 3751.05,    aliquota: 0.150, deducao: 394.16 },
+    { limite: 4664.68,    aliquota: 0.225, deducao: 675.49 },
+    { limite: Infinity,   aliquota: 0.275, deducao: 908.72 }
+];
+let acrescimoBrutoIRRF = 0.00133145;
+let mesReferenciaGlobal = "";
 
-    let mesReferenciaGlobal = "";
+/* ====================================================
+   TEMA CLARO / ESCURO
+   ==================================================== */
+function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    const novo = isDark ? 'light' : 'dark';
+    html.setAttribute('data-theme', novo);
+    document.getElementById('themeIcon').textContent  = isDark ? '🌙' : '☀️';
+    document.getElementById('themeLabel').textContent = isDark ? 'Modo Escuro' : 'Modo Claro';
+    try { localStorage.setItem('clt-theme', novo); } catch(e) {}
+}
 
-    async function carregarTabelasTributarias(dataFiltro) {
-        const statusBox = document.getElementById('apiStatusBox');
-        if (!dataFiltro) return;
-        
-        const dataObj = new Date(dataFiltro + "T12:00:00");
-        const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
-        const ano = dataObj.getFullYear();
-        mesReferenciaGlobal = `${mes}/${ano}`;
-
-        try {
-            // Utilizando AbortSignal para evitar travamentos longos
-            const response = await fetch(`https://api.exemplo.gov.br/tributos/vigentes?data=${ano}-${mes}`, { signal: AbortSignal.timeout(2000) });
-            if (response.ok) {
-                const data = await response.json();
-                tabelaINSS = data.inss.faixas;
-                tetoINSS = data.inss.teto;
-                tabelaIRRF = data.irrf.faixas;
-                acrescimoBrutoIRRF = data.irrf.notaAcrescimo;
-                statusBox.style.backgroundColor = "#dcfce7";
-                statusBox.style.color = "#15803d";
-                statusBox.innerText = `Tabelas carregadas online via API para a referência: ${mesReferenciaGlobal}`;
-            } else {
-                throw new Error("Endpoint indisponível");
-            }
-        } catch (err) {
-            // Como a URL exemplo.gov.br é fictícia, em produção (Vercel) ele cairá aqui de forma limpa, 
-            // informando o modo de tabelas locais com base no mês inserido sem alarmar erro de falta de rede.
-            statusBox.style.backgroundColor = "#fafafa";
-            statusBox.style.color = "var(--text-muted)";
-            statusBox.style.border = "1px solid var(--border)";
-            statusBox.innerText = `Tabelas aplicadas sob Regime de Competência para a referência: ${mesReferenciaGlobal}`;
-        }
-        
-        document.querySelectorAll('.ref-mes-ano').forEach(el => el.innerText = mesReferenciaGlobal);
+(function initTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem('clt-theme'); } catch(e) {}
+    if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('themeIcon').textContent  = '☀️';
+        document.getElementById('themeLabel').textContent = 'Modo Claro';
     }
+})();
 
-    // Monitora a alteração de data para disparar a busca autónoma do mês correspondente
-    document.getElementById('dataInicio').addEventListener('change', (e) => {
-        carregarTabelasTributarias(e.target.value);
-    });
+/* ====================================================
+   CONTADOR DE TEMPO DA CHAMADA À API
+   ==================================================== */
+let _timerStart    = null;
+let _timerInterval = null;
 
-    function formatarCampoMoeda(el) {
-        let value = el.value.replace(/\D/g, '');
-        if(!value) return;
-        value = (value / 100).toFixed(2) + '';
-        value = value.replace(".", ",");
-        value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-        el.value = 'R$ ' + value;
+function _timerTick() {
+    const el = document.getElementById('apiTimerEl');
+    if (!el || !_timerStart) return;
+    const seg = ((Date.now() - _timerStart) / 1000).toFixed(1);
+    el.textContent = '⏱ ' + seg + 's';
+}
+
+function iniciarTimer() {
+    _timerStart = Date.now();
+    if (_timerInterval) clearInterval(_timerInterval);
+    _timerInterval = setInterval(_timerTick, 100);
+}
+
+function pararTimer(labelFinal) {
+    if (_timerInterval) clearInterval(_timerInterval);
+    const el = document.getElementById('apiTimerEl');
+    if (el && _timerStart) {
+        const seg = ((Date.now() - _timerStart) / 1000).toFixed(2);
+        el.textContent = '⏱ ' + labelFinal + ' em ' + seg + 's';
     }
+}
 
-    document.querySelectorAll('.mask-money').forEach(input => {
-        input.addEventListener('input', (e) => formatarCampoMoeda(e.target));
-    });
+/* ====================================================
+   CARREGAR TABELAS VIA API (com fallback local)
+   ==================================================== */
+async function carregarTabelasTributarias(dataFiltro) {
+    if (!dataFiltro) return;
 
-    function parseMoney(str) {
-        if (!str) return 0;
-        let clean = str.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
-        return parseFloat(clean) || 0;
+    const dataObj = new Date(dataFiltro + 'T12:00:00');
+    const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+    const ano = dataObj.getFullYear();
+    mesReferenciaGlobal = mes + '/' + ano;
+
+    // Atualiza spans de referência em todo o doc
+    document.querySelectorAll('.ref-mes-ano,.ref-mes-ano-b,.ref-mes-ano-c')
+        .forEach(el => { el.innerText = mesReferenciaGlobal; });
+
+    // Status: carregando
+    const box = document.getElementById('apiStatusBox');
+    box.className = 'status-api loading';
+    box.innerHTML = `
+        <span class="status-icon"><span class="spinner"></span></span>
+        <div class="status-text">
+            <strong>Consultando tabelas via API…</strong>
+            <p>Buscando INSS/IRRF para referência ${mesReferenciaGlobal}</p>
+            <div class="api-timer" id="apiTimerEl">⏱ 0.0s</div>
+        </div>`;
+    iniciarTimer();
+
+    try {
+        const res = await fetch(
+            `https://api.exemplo.gov.br/tributos/vigentes?data=${ano}-${mes}`,
+            { signal: AbortSignal.timeout(2500) }
+        );
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        tabelaINSS          = data.inss.faixas;
+        tetoINSS            = data.inss.teto;
+        tabelaIRRF          = data.irrf.faixas;
+        acrescimoBrutoIRRF  = data.irrf.notaAcrescimo;
+        pararTimer('Carregadas via API');
+        box.className = 'status-api success';
+        box.innerHTML = `
+            <span class="status-icon">✅</span>
+            <div class="status-text">
+                <strong>Tabelas INSS/IRRF carregadas via API</strong>
+                <p>Referência ${mesReferenciaGlobal} — dados oficiais aplicados.</p>
+                <div class="api-timer" id="apiTimerEl">⏱ Carregadas com sucesso</div>
+            </div>`;
+    } catch (err) {
+        pararTimer('Tabelas locais aplicadas');
+        box.className = 'status-api offline';
+        box.innerHTML = `
+            <span class="status-icon">📋</span>
+            <div class="status-text">
+                <strong>Tabelas Locais 2026 — Regime de Competência</strong>
+                <p>Referência ${mesReferenciaGlobal} — INSS/IRRF conforme legislação vigente.</p>
+                <div class="api-timer" id="apiTimerEl">⏱ Aplicadas localmente</div>
+            </div>`;
     }
+}
 
-    function formatMoeda(val) {
-        return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+document.getElementById('dataInicio').addEventListener('change', e => {
+    carregarTabelasTributarias(e.target.value);
+});
+
+/* ====================================================
+   MÁSCARA DE MOEDA
+   ==================================================== */
+function formatarCampoMoeda(el) {
+    let v = el.value.replace(/\D/g, '');
+    if (!v) return;
+    v = (parseInt(v, 10) / 100).toFixed(2);
+    v = v.replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    el.value = 'R$ ' + v;
+}
+
+document.querySelectorAll('.mask-money').forEach(inp => {
+    inp.addEventListener('input', e => formatarCampoMoeda(e.target));
+    inp.addEventListener('blur',  e => formatarCampoMoeda(e.target));
+});
+
+function parseMoney(str) {
+    if (!str) return 0;
+    return parseFloat(
+        str.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()
+    ) || 0;
+}
+
+function formatMoeda(v) {
+    return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+/* ====================================================
+   CÁLCULO INSS (Tabela Progressiva)
+   ==================================================== */
+function calcularINSS(base) {
+    let total = 0, ant = 0, rest = base;
+    for (const f of tabelaINSS) {
+        if (rest <= 0) break;
+        const larg = f.limite - ant;
+        const naF  = Math.min(rest, larg);
+        total += naF * f.aliquota;
+        rest  -= naF;
+        ant    = f.limite;
     }
+    return Math.min(total, tetoINSS);
+}
 
-    function calcularINSS(base) {
-        let imposto = 0;
-        let baseRestante = base;
-        let limiteAnterior = 0;
-
-        for (let i = 0; i < tabelaINSS.length; i++) {
-            if (baseRestante <= 0) break;
-            let larguraFaixa = tabelaINSS[i].limite - limiteAnterior;
-            let valorNaFaixa = Math.min(baseRestante, larguraFaixa);
-            imposto += valorNaFaixa * tabelaINSS[i].aliquota;
-            baseRestante -= valorNaFaixa;
-            limiteAnterior = tabelaINSS[i].limite;
-        }
-        return Math.min(imposto, tetoINSS);
+/* ====================================================
+   CÁLCULO IRRF (Tabela Progressiva)
+   ==================================================== */
+function calcularIRRF(base, bruto) {
+    let imp = 0;
+    for (const f of tabelaIRRF) {
+        if (base <= f.limite) { imp = base * f.aliquota - f.deducao; break; }
     }
+    if (imp > 0 && bruto > 0) imp += bruto * acrescimoBrutoIRRF;
+    return Math.max(0, imp);
+}
 
-    function calcularIRRF(base, rendimentoBruto) {
-        let impostoBase = 0;
-        for (let i = 0; i < tabelaIRRF.length; i++) {
-            if (base <= tabelaIRRF[i].limite) {
-                impostoBase = (base * tabelaIRRF[i].aliquota) - tabelaIRRF[i].deducao;
-                break;
-            }
-        }
-        if (impostoBase > 0 && rendimentoBruto > 0) {
-            impostoBase += (rendimentoBruto * acrescimoBrutoIRRF);
-        }
-        return Math.max(0, impostoBase);
-    }
+/* ====================================================
+   CÁLCULO PRINCIPAL  ← CORREÇÃO DO BUG (era "ejecutar")
+   ==================================================== */
+async function executarCalculosGlobais() {
+    const form = document.getElementById('mainForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
 
-    async function ejecutarCalculosGlobais() {
-        const form = document.getElementById('mainForm');
-        if (!form.checkValidity()) {
-            alert("Por favor, preencha todos os campos obrigatórios (*).");
-            return;
-        }
-
-        const dataInicioStr = document.getElementById('dataInicio').value;
+    const dataInicioStr = document.getElementById('dataInicio').value;
+    if (!mesReferenciaGlobal) {
         await carregarTabelasTributarias(dataInicioStr);
-
-        const empresa = document.getElementById('empresa').value;
-        const empregado = document.getElementById('empregado').value;
-        const matricula = document.getElementById('matricula').value;
-        
-        const salario = parseMoney(document.getElementById('salario').value);
-        const adicionais = parseMoney(document.getElementById('adicionais').value);
-        const mediaFerias = parseMoney(document.getElementById('mediaFerias').value);
-        const faltas = parseInt(document.getElementById('faltas').value) || 0;
-        
-        let diasGozo = parseInt(document.getElementById('diasGozo').value) || 30;
-        const temAbono = document.getElementById('abono').checked;
-        const tem13 = document.getElementById('adiantamento13').checked;
-
-        let diasDireitoMaximo = 30;
-        if (faltas > 5 && faltas <= 14) diasDireitoMaximo = 24;
-        else if (faltas > 14 && faltas <= 22) diasDireitoMaximo = 18;
-        else if (faltas > 22 && faltas <= 32) diasDireitoMaximo = 12;
-        else if (faltas > 32) diasDireitoMaximo = 0;
-
-        if (diasGozo > diasDireitoMaximo) {
-            alert(`Aviso: Limite de gozo reduzido para ${diasDireitoMaximo} dias devido às faltas.`);
-            diasGozo = diasDireitoMaximo;
-            document.getElementById('diasGozo').value = diasDireitoMaximo;
-        }
-
-        if (temAbono && diasGozo > 20) {
-            diasGozo = 20;
-            document.getElementById('diasGozo').value = 20;
-        }
-
-        const baseRemuneracaoFf = salario + adicionais + mediaFerias;
-        const valorFeriasGozo = (baseRemuneracaoFf / 30) * diasGozo;
-        const tercoConstitucional = valorFeriasGozo / 3;
-
-        let valorAbono = 0;
-        let tercoAbono = 0;
-        if (temAbono) {
-            valorAbono = (baseRemuneracaoFf / 30) * 10;
-            tercoAbono = valorAbono / 3;
-        }
-
-        let valor13 = tem13 ? (salario * 0.5) : 0;
-
-        const baseTributavelRecibo = valorFeriasGozo + tercoConstitucional;
-        const inssRecibo = calcularINSS(baseTributavelRecibo);
-        const irrfRecibo = calcularIRRF(baseTributavelRecibo - inssRecibo, baseTributavelRecibo);
-
-        const brutoRecibo = valorFeriasGozo + tercoConstitucional + valorAbono + tercoAbono + valor13;
-        const descontosRecibo = inssRecibo + irrfRecibo;
-        const liquidoRecibo = brutoRecibo - descontosRecibo;
-
-        const rateioFolhas = calcularImpactoFolha(dataInicioStr, diasGozo, baseRemuneracaoFf, salario + adicionais);
-
-        renderizarPainelResultados(valorFeriasGozo, diasGozo, tercoConstitucional, valorAbono, tercoAbono, valor13, inssRecibo, irrfRecibo, brutoRecibo, descontosRecibo, liquidoRecibo, rateioFolhas);
-        preencherDadosImpressao(empresa, empregado, matricula, dataInicioStr, diasGozo, valorFeriasGozo, tercoConstitucional, valorAbono, tercoAbono, valor13, inssRecibo, irrfRecibo, brutoRecibo, descontosRecibo, liquidoRecibo, rateioFolhas);
     }
 
-    function calcularImpactoFolha(dataInicioStr, diasGozo, baseRemuneracaoFf, salarioMensalFixo) {
-        const partes = dataInicioStr.split('-');
-        let dataCorrente = new Date(partes[0], partes[1] - 1, partes[2]);
-        let distribuicao = {};
+    const empresa     = document.getElementById('empresa').value.trim();
+    const empregado   = document.getElementById('empregado').value.trim();
+    const matricula   = document.getElementById('matricula').value.trim();
+    const salario     = parseMoney(document.getElementById('salario').value);
+    const adicionais  = parseMoney(document.getElementById('adicionais').value);
+    const mediaFerias = parseMoney(document.getElementById('mediaFerias').value);
+    const faltas      = parseInt(document.getElementById('faltas').value) || 0;
+    const temAbono    = document.getElementById('abono').checked;
+    const tem13       = document.getElementById('adiantamento13').checked;
 
-        for (let i = 0; i < diasGozo; i++) {
-            let compKey = `${String(dataCorrente.getMonth() + 1).padStart(2, '0')}/${dataCorrente.getFullYear()}`;
-            distribuicao[compKey] = (distribuicao[compKey] || 0) + 1;
-            dataCorrente.setDate(dataCorrente.getDate() + 1);
-        }
+    let diasGozo = parseInt(document.getElementById('diasGozo').value) || 30;
 
-        let resultado = [];
-        for (let comp in distribuicao) {
-            let diasFfMes = distribuicao[comp];
-            let diasTrabalhadosMes = Math.max(0, 30 - diasFfMes);
+    // Redução por faltas (Art. 130 CLT)
+    let diasMax = 30;
+    if      (faltas > 5  && faltas <= 14) diasMax = 24;
+    else if (faltas > 14 && faltas <= 22) diasMax = 18;
+    else if (faltas > 22 && faltas <= 32) diasMax = 12;
+    else if (faltas > 32)                 diasMax = 0;
 
-            let verbaSalarioEfetivo = (salarioMensalFixo / 30) * diasTrabalhadosMes;
-            let verbaFeriasProporcional = (baseRemuneracaoFf / 30) * diasFfMes;
-            let verbaTercoProporcional = verbaFeriasProporcional / 3;
-
-            let baseTributavelFolha = verbaSalarioEfetivo + verbaFeriasProporcional + verbaTercoProporcional;
-            let inssFolha = calcularINSS(baseTributavelFolha);
-            let irrfFolha = calcularIRRF(baseTributavelFolha - inssFolha, baseTributavelFolha);
-
-            resultado.push({
-                competencia: comp,
-                diasTrab: diasTrabalhadosMes,
-                diasFf: diasFfMes,
-                salario: verbaSalarioEfetivo,
-                ferias: verbaFeriasProporcional,
-                terco: verbaTercoProporcional,
-                bruto: baseTributavelFolha,
-                inss: inssFolha,
-                irrf: irrfFolha,
-                liquido: verbaSalarioEfetivo - (inssFolha + irrfFolha)
-            });
-        }
-        return resultado;
+    if (diasGozo > diasMax) {
+        alert(`Atenção: Faltas excedem o limite. Dias de gozo ajustados para ${diasMax} (Art. 130 CLT).`);
+        diasGozo = diasMax;
+        document.getElementById('diasGozo').value = diasMax;
+    }
+    if (temAbono && diasGozo > 20) {
+        diasGozo = 20;
+        document.getElementById('diasGozo').value = 20;
     }
 
-    function renderizarPainelResultados(vf, df, tf, va, ta, v13, inss, irrf, brute, desc, liq, rateio) {
-        const div = document.getElementById('dashboardResultados');
-        let html = `
-            <div class="section-sub">1. Composição do Recibo de Férias — Ref: ${mesReferenciaGlobal}</div>
-            <table class="res-table">
-                <thead><tr><th>Evento Calculado</th><th>Base Legal</th><th class="text-right">Proventos</th><th class="text-right">Descontos</th></tr></thead>
-                <tbody>
-                    <tr><td>Férias Regulamentares, Médias e Adicionais (${df} dias)</td><td><span class="legal-ref">Art. 129 CLT</span></td><td class="text-right val-prov">${formatMoeda(vf)}</td><td class="text-right">-</td></tr>
-                    <tr><td>1/3 Constitucional de Férias</td><td><span class="legal-ref">Art. 7º, XVII CF</span></td><td class="text-right val-prov">${formatMoeda(tf)}</td><td class="text-right">-</td></tr>
-        `;
+    // Base de remuneração para férias
+    const baseRemFf          = salario + adicionais + mediaFerias;
+    const valorFeriasGozo    = (baseRemFf / 30) * diasGozo;
+    const tercoConstitucional = valorFeriasGozo / 3;
 
-        if (va > 0) {
-            html += `
-                <tr><td>Abono Pecuniário (10 dias)</td><td><span class="legal-ref">Art. 143 CLT</span></td><td class="text-right val-prov">${formatMoeda(va)}</td><td class="text-right">-</td></tr>
-                <tr><td>1/3 Constitucional s/ Abono</td><td><span class="legal-ref">Art. 143 §1º CLT</span></td><td class="text-right val-prov">${formatMoeda(ta)}</td><td class="text-right">-</td></tr>
-            `;
-        }
-        if (v13 > 0) {
-            html += `<tr><td>Adiantamento 1ª Parcela 13º</td><td><span class="legal-ref">Lei 4.090/62</span></td><td class="text-right val-prov">${formatMoeda(v13)}</td><td class="text-right">-</td></tr>`;
-        }
+    let valorAbono = 0, tercoAbono = 0;
+    if (temAbono) {
+        valorAbono = (baseRemFf / 30) * 10;
+        tercoAbono = valorAbono / 3;
+    }
+
+    const valor13 = tem13 ? salario * 0.5 : 0;
+
+    // Base tributável do recibo (férias + 1/3)
+    const baseTribRecibo = valorFeriasGozo + tercoConstitucional;
+    const inssRecibo     = calcularINSS(baseTribRecibo);
+    const irrfRecibo     = calcularIRRF(baseTribRecibo - inssRecibo, baseTribRecibo);
+
+    const brutoRecibo     = valorFeriasGozo + tercoConstitucional + valorAbono + tercoAbono + valor13;
+    const descontosRecibo = inssRecibo + irrfRecibo;
+    const liquidoRecibo   = brutoRecibo - descontosRecibo;
+
+    const rateio = calcularImpactoFolha(dataInicioStr, diasGozo, baseRemFf, salario + adicionais, inssRecibo, irrfRecibo);
+
+    renderizarPainelResultados(
+        valorFeriasGozo, diasGozo, tercoConstitucional,
+        valorAbono, tercoAbono, valor13,
+        inssRecibo, irrfRecibo,
+        brutoRecibo, descontosRecibo, liquidoRecibo,
+        rateio,
+        salario, adicionais, mediaFerias
+    );
+
+    preencherDadosImpressao(
+        empresa, empregado, matricula, dataInicioStr, diasGozo,
+        valorFeriasGozo, tercoConstitucional,
+        valorAbono, tercoAbono, valor13,
+        inssRecibo, irrfRecibo,
+        brutoRecibo, descontosRecibo, liquidoRecibo,
+        rateio,
+        salario, adicionais, mediaFerias
+    );
+}
+
+/* ====================================================
+   RATEIO POR COMPETÊNCIA
+   ==================================================== */
+function calcularImpactoFolha(dataInicioStr, diasGozo, baseRemFf, salFixo, inssRecibo, irrfRecibo) {
+    /* Distribui os dias de férias por competência */
+    const [a, m, d] = dataInicioStr.split('-').map(Number);
+    let cur = new Date(a, m - 1, d);
+    const dist = {};
+    for (let i = 0; i < diasGozo; i++) {
+        const key = String(cur.getMonth() + 1).padStart(2, '0') + '/' + cur.getFullYear();
+        dist[key] = (dist[key] || 0) + 1;
+        cur.setDate(cur.getDate() + 1);
+    }
+    return Object.entries(dist).map(([comp, diasFf]) => {
+        const diasTrab = Math.max(0, 30 - diasFf);
+        const salEfet  = (salFixo   / 30) * diasTrab;
+        const ferProp  = (baseRemFf / 30) * diasFf;
+        const tercProp = ferProp / 3;
+        /* Tributos da FOLHA: base = salário efetivo APENAS.
+           Os tributos sobre férias+1/3 foram calculados com base própria
+           no recibo (Art. 7º CF + Art. 145 CLT) e já retidos naquele documento. */
+        const inss_folha = calcularINSS(salEfet);
+        const irrf_folha = calcularIRRF(salEfet - inss_folha, salEfet);
+        /* Parcela do INSS/IRRF do recibo rateada pro-rata para informação */
+        const fracao = diasGozo > 0 ? diasFf / diasGozo : 0;
+        const inss_recibo_comp = inssRecibo * fracao;
+        const irrf_recibo_comp = irrfRecibo * fracao;
+        const liquido = salEfet - inss_folha - irrf_folha;
+        return {
+            competencia: comp, diasTrab, diasFf,
+            salario: salEfet, ferias: ferProp, terco: tercProp,
+            bruto: salEfet + ferProp + tercProp,
+            inss_folha, irrf_folha,
+            inss_recibo_comp, irrf_recibo_comp,
+            liquido
+        };
+    });
+}
+
+/* ====================================================
+   RENDERIZAR DASHBOARD
+   ==================================================== */
+function renderizarPainelResultados(vf, df, tf, va, ta, v13, inss, irrf, bruto, desc, liq, rateio, salBase, adicionaisFixos, mediasVar) {
+    salBase = salBase || 0; adicionaisFixos = adicionaisFixos || 0; mediasVar = mediasVar || 0;
+    const baseRemFf = salBase + adicionaisFixos + mediasVar;
+    const salFerProp = baseRemFf > 0 ? (salBase / baseRemFf) * vf : vf;
+    const adicFerProp = baseRemFf > 0 ? (adicionaisFixos / baseRemFf) * vf : 0;
+    const mediasVarProp = baseRemFf > 0 ? (mediasVar / baseRemFf) * vf : 0;
+
+    let html = `
+    <div class="summary-grid">
+        <div class="summary-card sc-highlight">
+            <div class="s-label">💵 Líquido a Receber</div>
+            <div class="s-value">${formatMoeda(liq)}</div>
+        </div>
+        <div class="summary-card sc-success">
+            <div class="s-label">📈 Total Proventos</div>
+            <div class="s-value">${formatMoeda(bruto)}</div>
+        </div>
+        <div class="summary-card sc-danger">
+            <div class="s-label">📉 Total Descontos</div>
+            <div class="s-value">${formatMoeda(desc)}</div>
+        </div>
+    </div>
+
+    <div class="section-sub">📄 1. Composição do Recibo de Férias — Ref: ${mesReferenciaGlobal}</div>
+    <table class="res-table">
+        <thead><tr>
+            <th>Evento Calculado</th>
+            <th>Base Legal</th>
+            <th class="text-right">Proventos</th>
+            <th class="text-right">Descontos</th>
+        </tr></thead>
+        <tbody>
+            <tr class="row-base-detalhe">
+                <td style="padding-left:1.1rem">↳ Salário-Base pro-rata (${df} dias)</td>
+                <td><span class="legal-ref">Art. 129 CLT</span></td>
+                <td class="text-right val-prov-sub">${formatMoeda(salFerProp)}</td>
+                <td class="text-right">—</td>
+            </tr>`;
+    if (adicionaisFixos > 0) html += `
+            <tr class="row-base-detalhe">
+                <td style="padding-left:1.1rem">↳ Adicionais Fixos pro-rata (${df} dias)</td>
+                <td><span class="legal-ref">Art. 129 CLT</span></td>
+                <td class="text-right val-prov-sub">${formatMoeda(adicFerProp)}</td>
+                <td class="text-right">—</td>
+            </tr>`;
+    if (mediasVar > 0) html += `
+            <tr class="row-base-detalhe">
+                <td style="padding-left:1.1rem">↳ Médias Variáveis pro-rata (${df} dias)</td>
+                <td><span class="legal-ref">Súm. 253 TST</span></td>
+                <td class="text-right val-prov-sub">${formatMoeda(mediasVarProp)}</td>
+                <td class="text-right">—</td>
+            </tr>`;
+    html += `
+            <tr>
+                <td style="padding-left:1.1rem">↳ 1/3 Constitucional de Férias</td>
+                <td><span class="legal-ref">Art. 7º, XVII CF/88</span></td>
+                <td class="text-right val-prov-sub">${formatMoeda(tf)}</td>
+                <td class="text-right">—</td>
+            </tr>
+            <tr class="row-subtotal-ferias">
+                <td><strong>Férias Regulamentares — Subtotal (${df} dias)</strong></td>
+                <td><span class="legal-ref">Art. 129 CLT</span></td>
+                <td class="text-right val-prov"><strong>${formatMoeda(vf + tf)}</strong></td>
+                <td class="text-right">—</td>
+            </tr>`;
+
+    if (va > 0) html += `
+            <tr>
+                <td>Abono Pecuniário (10 dias)</td>
+                <td><span class="legal-ref">Art. 143 CLT</span></td>
+                <td class="text-right val-prov">${formatMoeda(va)}</td>
+                <td class="text-right">—</td>
+            </tr>
+            <tr>
+                <td>1/3 Constitucional sobre Abono</td>
+                <td><span class="legal-ref">Art. 143 §1º CLT</span></td>
+                <td class="text-right val-prov">${formatMoeda(ta)}</td>
+                <td class="text-right">—</td>
+            </tr>`;
+
+    if (v13 > 0) html += `
+            <tr>
+                <td>Adiantamento da 1ª Parcela do 13º Salário</td>
+                <td><span class="legal-ref">Lei 4.090/62</span></td>
+                <td class="text-right val-prov">${formatMoeda(v13)}</td>
+                <td class="text-right">—</td>
+            </tr>`;
+
+    html += `
+            <tr>
+                <td>Contribuição Previdenciária — INSS</td>
+                <td><span class="legal-ref">IN RFB 2110/22</span></td>
+                <td class="text-right">—</td>
+                <td class="text-right val-desc">${formatMoeda(inss)}</td>
+            </tr>
+            <tr>
+                <td>Imposto de Renda Retido na Fonte — IRRF</td>
+                <td><span class="legal-ref">Lei 9.250/95</span></td>
+                <td class="text-right">—</td>
+                <td class="text-right val-desc">${formatMoeda(irrf)}</td>
+            </tr>
+            <tr class="row-total">
+                <td>Totais do Recibo</td>
+                <td>—</td>
+                <td class="text-right val-prov">${formatMoeda(bruto)}</td>
+                <td class="text-right val-desc">${formatMoeda(desc)}</td>
+            </tr>
+            <tr style="font-weight:800; background:rgba(30,58,138,.07);">
+                <td style="color:var(--primary)">
+                    LÍQUIDO DO RECIBO
+                    <small style="font-weight:400; color:var(--text-muted)"> — pagar até 2 dias antes (Art. 145 CLT)</small>
+                </td>
+                <td>—</td>
+                <td colspan="2" class="text-right" style="color:var(--primary); font-size:1.05rem;">${formatMoeda(liq)}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="section-sub">📊 2. Impacto e Rateio na Folha por Competência</div>`;
+
+    rateio.forEach(it => {
+        const salBaseFolhaProp = baseRemFf > 0 ? (salBase / baseRemFf) * it.ferias : it.ferias;
+        const adicFolhaProp    = baseRemFf > 0 ? (adicionaisFixos / baseRemFf) * it.ferias : 0;
+        const mediasFolhaProp  = baseRemFf > 0 ? (mediasVar / baseRemFf) * it.ferias : 0;
+
+        let subRows = `
+                <tr class="row-base-detalhe">
+                    <td style="padding-left:1.1rem">↳ Salário-Base das Férias (Competência)</td>
+                    <td>${it.diasFf} dias</td>
+                    <td class="text-right val-prov-sub">${formatMoeda(salBaseFolhaProp)}</td>
+                    <td class="text-right val-desc-sub">${formatMoeda(salBaseFolhaProp)}</td>
+                </tr>`;
+        if (adicionaisFixos > 0) subRows += `
+                <tr class="row-base-detalhe">
+                    <td style="padding-left:1.1rem">↳ Adicionais Fixos das Férias (Competência)</td>
+                    <td>${it.diasFf} dias</td>
+                    <td class="text-right val-prov-sub">${formatMoeda(adicFolhaProp)}</td>
+                    <td class="text-right val-desc-sub">${formatMoeda(adicFolhaProp)}</td>
+                </tr>`;
+        if (mediasVar > 0) subRows += `
+                <tr class="row-base-detalhe">
+                    <td style="padding-left:1.1rem">↳ Médias Variáveis das Férias (Competência)</td>
+                    <td>${it.diasFf} dias</td>
+                    <td class="text-right val-prov-sub">${formatMoeda(mediasFolhaProp)}</td>
+                    <td class="text-right val-desc-sub">${formatMoeda(mediasFolhaProp)}</td>
+                </tr>`;
 
         html += `
-                    <tr><td>Dedução INSS Férias</td><td><span class="legal-ref">Tabela Progressiva</span></td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(inss)}</td></tr>
-                    <tr><td>Retenção IRRF Férias</td><td><span class="legal-ref">Tabela Progressiva</span></td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(irrf)}</td></tr>
-                    <tr class="row-total"><td>Totais do Recibo</td><td>-</td><td class="text-right val-prov">${formatMoeda(brute)}</td><td class="text-right val-desc">${formatMoeda(desc)}</td></tr>
-                    <tr class="row-total" style="background:#e2e8f0;"><td>LÍQUIDO DO RECIBO (Pagar até 2 dias antes)</td><td><span class="legal-ref">Art. 145 CLT</span></td><td colspan="2" class="text-right" style="color:var(--primary); font-size:1.1rem;">${formatMoeda(liq)}</td></tr>
-                </tbody>
-            </table>
+    <div class="folha-box">
+        <div class="folha-title">📅 Competência: ${it.competencia} &nbsp;·&nbsp; Ref. Tabelas: ${mesReferenciaGlobal}</div>
+        <table class="res-table" style="margin-bottom:0">
+            <thead><tr>
+                <th>Componente da Folha</th>
+                <th>Dias/Ref.</th>
+                <th class="text-right">Proventos</th>
+                <th class="text-right">Descontos</th>
+            </tr></thead>
+            <tbody>
+                <tr>
+                    <td>Saldo de Salário Efetivo (Período Trabalhado)</td>
+                    <td>${it.diasTrab} dias</td>
+                    <td class="text-right">${formatMoeda(it.salario)}</td>
+                    <td class="text-right">—</td>
+                </tr>
+                ${subRows}
+                <tr>
+                    <td style="padding-left:1.1rem">↳ 1/3 Constitucional pro-rata (Competência)</td>
+                    <td>Pro-rata</td>
+                    <td class="text-right val-prov-sub">${formatMoeda(it.terco)}</td>
+                    <td class="text-right val-desc-sub">${formatMoeda(it.terco)}</td>
+                </tr>
+                <tr class="row-subtotal-ferias">
+                    <td><strong>Férias — Subtotal da Competência</strong></td>
+                    <td>${it.diasFf} dias</td>
+                    <td class="text-right val-prov"><strong>${formatMoeda(it.ferias + it.terco)}</strong></td>
+                    <td class="text-right val-desc"><strong>${formatMoeda(it.ferias + it.terco)}</strong></td>
+                </tr>
+                <tr class="row-retido-recibo">
+                    <td style="padding-left:1.1rem">↳ INSS s/ Férias+1/3 — retido no recibo (pro-rata)</td>
+                    <td>Recibo</td>
+                    <td class="text-right">—</td>
+                    <td class="text-right val-desc-retido">(−) ${formatMoeda(it.inss_recibo_comp)}</td>
+                </tr>
+                <tr class="row-retido-recibo">
+                    <td style="padding-left:1.1rem">↳ IRRF s/ Férias+1/3 — retido no recibo (pro-rata)</td>
+                    <td>Recibo</td>
+                    <td class="text-right">—</td>
+                    <td class="text-right val-desc-retido">(−) ${formatMoeda(it.irrf_recibo_comp)}</td>
+                </tr>
+                <tr>
+                    <td>INSS s/ Saldo de Salário (Folha)</td>
+                    <td>Progressivo</td>
+                    <td class="text-right">—</td>
+                    <td class="text-right val-desc">${it.inss_folha > 0 ? formatMoeda(it.inss_folha) : '—'}</td>
+                </tr>
+                <tr>
+                    <td>IRRF s/ Saldo de Salário (Folha)</td>
+                    <td>Progressivo</td>
+                    <td class="text-right">—</td>
+                    <td class="text-right val-desc">${it.irrf_folha > 0 ? formatMoeda(it.irrf_folha) : '—'}</td>
+                </tr>
+                <tr style="font-weight:800; background:var(--success-bg);">
+                    <td style="color:var(--secondary)">Líquido Efetivo no Contracheque</td>
+                    <td>—</td>
+                    <td colspan="2" class="text-right" style="color:var(--secondary); font-size:1rem;">${formatMoeda(it.liquido)}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>`;
+    });
 
-            <div class="section-sub">2. Resumos de Impacto e Encargos na Folha Mensal</div>
-        `;
+    document.getElementById('dashboardResultados').innerHTML = html;
+}
 
-        rateio.forEach(item => {
-            html += `
-                <div class="folha-box">
-                    <div class="folha-title">Mês/Ano Competência: ${item.competencia} (Tabela Ref: ${mesReferenciaGlobal})</div>
-                    <table class="res-table" style="margin-bottom:0;">
-                        <thead><tr><th>Componente da Folha</th><th>Fração / Ref.</th><th class="text-right">Proventos</th><th class="text-right">Descontos</th></tr></thead>
-                        <tbody>
-                            <tr><td>Saldo de Salário Efetivo</td><td>${item.diasTrab} dias</td><td class="text-right">${formatMoeda(item.salario)}</td><td class="text-right">-</td></tr>
-                            <tr><td>Férias Gozadas, Médias e Adicionais (Base)</td><td>${item.diasFf} dias</td><td class="text-right val-prov">${formatMoeda(item.ferias)}</td><td class="text-right val-desc">${formatMoeda(item.ferias)}</td></tr>
-                            <tr><td>1/3 Constitucional de Férias (Base)</td><td>Pro-rata</td><td class="text-right val-prov">${formatMoeda(item.terco)}</td><td class="text-right val-desc">${formatMoeda(item.terco)}</td></tr>
-                            <tr><td>(-) Retenção INSS da Competência</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(item.inss)}</td></tr>
-                            <tr><td>(-) Retenção IRRF da Competência</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right val-desc">${formatMoeda(item.irrf)}</td></tr>
-                            <tr class="row-total" style="background:#fff;"><td style="color:var(--secondary)">Líquido Efetivo no Contracheque</td><td>-</td><td colspan="2" class="text-right" style="color:var(--secondary); font-size:1rem;">${formatMoeda(item.liquido)}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        });
+/* ====================================================
+   PREENCHER ÁREA DE IMPRESSÃO
+   ==================================================== */
+function preencherDadosImpressao(emp, empNome, mat, datInic, df,
+        vf, tf, va, ta, v13, inss, irrf, bruto, desc, liq, rateio,
+        salBase, adicionaisFixos, mediasVar) {
+    salBase = salBase || 0; adicionaisFixos = adicionaisFixos || 0; mediasVar = mediasVar || 0;
+    const baseRemFf = salBase + adicionaisFixos + mediasVar;
 
-        div.innerHTML = html;
-    }
+    document.getElementById('pCompany').innerText       = emp;
+    document.getElementById('pMatricula').innerText     = mat;
+    document.getElementById('pEmployee').innerText      = empNome;
+    document.getElementById('pEmployeeFolha').innerText = empNome;
+    document.getElementById('pMatriculaFolha').innerText = mat;
 
-    function preencherDadosImpressao(emp, empNome, mat, datInic, df, vf, tf, va, ta, v13, inss, irrf, brute, desc, liq, rateio) {
-        document.getElementById('pCompany').innerText = emp;
-        document.getElementById('pMatricula').innerText = mat;
-        document.getElementById('pEmployee').innerText = empNome;
-        document.getElementById('pMatriculaFolha').innerText = mat;
-        document.getElementById('pEmployeeFolha').innerText = empNome;
-        document.getElementById('pDias').innerText = df;
+    const [a, m, d] = datInic.split('-').map(Number);
+    const dIni = new Date(a, m - 1, d);
+    const dFim = new Date(a, m - 1, d + df - 1);
+    document.getElementById('pDataInic').innerText = dIni.toLocaleDateString('pt-BR');
+    document.getElementById('pDataFim').innerText  = dFim.toLocaleDateString('pt-BR');
+    document.getElementById('pDias').innerText     = df;
 
-        const partes = datInic.split('-');
-        let dInicObj = new Date(partes[0], partes[1] - 1, partes[2]);
-        document.getElementById('pDataInic').innerText = dInicObj.toLocaleDateString('pt-BR');
-        
-        let dFimObj = new Date(dInicObj);
-        dFimObj.setDate(dFimObj.getDate() + (df - 1));
-        document.getElementById('pDataFim').innerText = dFimObj.toLocaleDateString('pt-BR');
+    document.querySelectorAll('.ref-mes-ano,.ref-mes-ano-b,.ref-mes-ano-c')
+        .forEach(el => { el.innerText = mesReferenciaGlobal; });
 
-        let tbody = document.querySelector('#tableReciboImp tbody');
-        let lines = `
-            <tr><td>Férias Regulamentares, Médias e Adicionais</td><td>Art. 129 CLT</td><td class="text-right">${formatMoeda(vf)}</td><td class="text-right">-</td></tr>
-            <tr><td>1/3 Constitucional de Férias</td><td>Art. 7º, XVII CF</td><td class="text-right">${formatMoeda(tf)}</td><td class="text-right">-</td></tr>
-        `;
-        if (va > 0) {
-            lines += `
-                <tr><td>Abono Pecuniário</td><td>Art. 143 CLT</td><td class="text-right">${formatMoeda(va)}</td><td class="text-right">-</td></tr>
-                <tr><td>1/3 Constitucional sobre Abono</td><td>Art. 143 §1º CLT</td><td class="text-right">${formatMoeda(ta)}</td><td class="text-right">-</td></tr>
-            `;
-        }
-        if (v13 > 0) {
-            lines += `<tr><td>Antecipação de Primeira Parcela de 13º</td><td>Lei 4.090/62</td><td class="text-right">${formatMoeda(v13)}</td><td class="text-right">-</td></tr>`;
-        }
-        lines += `
-            <tr><td>Contribuição Previdenciária (INSS)</td><td>Tabela Progressiva</td><td class="text-right">-</td><td class="text-right">${formatMoeda(inss)}</td></tr>
-            <tr><td>Imposto de Renda Retido na Fonte (IRRF)</td><td>Tabela Progressiva</td><td class="text-right">-</td><td class="text-right">${formatMoeda(irrf)}</td></tr>
-            <tr style="font-weight:bold;"><td>TOTAIS DO DEMONSTRATIVO</td><td>-</td><td class="text-right">${formatMoeda(brute)}</td><td class="text-right">${formatMoeda(desc)}</td></tr>
-            <tr style="font-weight:bold; background-color:#eaeaea;"><td>VALOR LÍQUIDO A RECEBER</td><td>Art. 145 CLT</td><td colspan="2" class="text-right">${formatMoeda(liq)}</td></tr>
-        `;
-        tbody.innerHTML = lines;
+    // Corpo do recibo
+    const tbody = document.querySelector('#tableReciboImp tbody');
+    const salFerPropImp   = baseRemFf > 0 ? (salBase / baseRemFf) * vf : vf;
+    const adicFerPropImp  = baseRemFf > 0 ? (adicionaisFixos / baseRemFf) * vf : 0;
+    const mediasFerPropImp = baseRemFf > 0 ? (mediasVar / baseRemFf) * vf : 0;
+    let lines = `
+        <tr class="imp-sub-row"><td style="padding-left:14px">↳ Salário-Base pro-rata (${df} dias)</td><td>Art. 129 CLT</td><td class="prov-sub">${formatMoeda(salFerPropImp)}</td><td>—</td></tr>`;
+    if (adicionaisFixos > 0) lines += `
+        <tr class="imp-sub-row"><td style="padding-left:14px">↳ Adicionais Fixos pro-rata (${df} dias)</td><td>Art. 129 CLT</td><td class="prov-sub">${formatMoeda(adicFerPropImp)}</td><td>—</td></tr>`;
+    if (mediasVar > 0) lines += `
+        <tr class="imp-sub-row"><td style="padding-left:14px">↳ Médias Variáveis pro-rata (${df} dias)</td><td>Súm. 253 TST</td><td class="prov-sub">${formatMoeda(mediasFerPropImp)}</td><td>—</td></tr>`;
+    lines += `
+        <tr class="imp-sub-row"><td style="padding-left:14px">↳ 1/3 Constitucional de Férias</td><td>Art. 7º, XVII CF/88</td><td class="prov-sub">${formatMoeda(tf)}</td><td>—</td></tr>
+        <tr class="imp-subtotal-row"><td><strong>Férias Regulamentares — Subtotal (${df} dias)</strong></td><td>Art. 129 CLT</td><td class="prov"><strong>${formatMoeda(vf + tf)}</strong></td><td>—</td></tr>`;
+    if (va > 0) lines += `
+        <tr><td>Abono Pecuniário (10 dias)</td><td>Art. 143 CLT</td><td class="prov">${formatMoeda(va)}</td><td>—</td></tr>
+        <tr><td>1/3 Constitucional sobre Abono</td><td>Art. 143 §1º CLT</td><td class="prov">${formatMoeda(ta)}</td><td>—</td></tr>`;
+    if (v13 > 0) lines += `
+        <tr><td>Adiantamento da 1ª Parcela do 13º Salário</td><td>Lei 4.090/62</td><td class="prov">${formatMoeda(v13)}</td><td>—</td></tr>`;
+    lines += `
+        <tr><td>Contribuição Previdenciária — INSS</td><td>IN RFB 2110/22</td><td>—</td><td class="desc">${formatMoeda(inss)}</td></tr>
+        <tr><td>Imposto de Renda Retido na Fonte — IRRF</td><td>Lei 9.250/95</td><td>—</td><td class="desc">${formatMoeda(irrf)}</td></tr>
+        <tr class="total-row"><td>TOTAIS DO DEMONSTRATIVO</td><td>—</td><td class="prov">${formatMoeda(bruto)}</td><td class="desc">${formatMoeda(desc)}</td></tr>
+        <tr class="liquido-row"><td colspan="2">VALOR LÍQUIDO A RECEBER &nbsp;·&nbsp; Art. 145 CLT (pagar até 2 dias antes)</td><td colspan="2" style="text-align:right">${formatMoeda(liq)}</td></tr>`;
+    tbody.innerHTML = lines;
 
-        let folhaDiv = document.getElementById('folhaCompetenciasImp');
-        let folhaHtml = "";
-        rateio.forEach(item => {
-            folhaHtml += `
-                <div style="margin-top:15px; page-break-inside: avoid;">
-                    <h4 style="border-bottom:1px solid #000; padding-bottom:2px;">Competência Mensal: ${item.competencia} (Tabela Ref: ${mesReferenciaGlobal})</h4>
-                    <table class="imp-table">
-                        <thead><tr><th>Item da Folha</th><th>Dias/Referência</th><th style="text-align:right;">Proventos</th><th style="text-align:right;">Descontos</th></tr></thead>
-                        <tbody>
-                            <tr><td>Saldo de Salário (Período Trabalhado)</td><td>${item.diasTrab} dias</td><td class="text-right">${formatMoeda(item.salario)}</td><td class="text-right">-</td></tr>
-                            <tr><td>Férias Regulamentares, Médias e Adicionais (Composição de Base)</td><td>${item.diasFf} dias</td><td class="text-right">${formatMoeda(item.ferias)}</td><td class="text-right">${formatMoeda(item.ferias)}</td></tr>
-                            <tr><td>1/3 Constitucional de Férias Proporcional (Composição de Base)</td><td>Pro-rata</td><td class="text-right">${formatMoeda(item.terco)}</td><td class="text-right">${formatMoeda(item.terco)}</td></tr>
-                            <tr><td>Débito de Contribuição Previdenciária (INSS)</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right">${formatMoeda(item.inss)}</td></tr>
-                            <tr><td>Débito de Imposto de Renda (IRRF)</td><td>Progressivo</td><td class="text-right">-</td><td class="text-right">${formatMoeda(item.irrf)}</td></tr>
-                            <tr style="font-weight:bold; background-color:#eaeaea;"><td>SALDO LÍQUIDO DO CONTRACHEQUE NO MÊS</td><td>-</td><td colspan="2" class="text-right">${formatMoeda(item.liquido)}</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        });
-        folhaDiv.innerHTML = folhaHtml;
-    }
+    // Folha por competência
+    let folhaHtml = '';
+    rateio.forEach(it => {
+        const salBaseFpImp  = baseRemFf > 0 ? (salBase / baseRemFf) * it.ferias : it.ferias;
+        const adicFpImp     = baseRemFf > 0 ? (adicionaisFixos / baseRemFf) * it.ferias : 0;
+        const mediasFpImp   = baseRemFf > 0 ? (mediasVar / baseRemFf) * it.ferias : 0;
+
+        let subRowsImp = `
+                <tr class="imp-sub-row"><td style="padding-left:14px">↳ Salário-Base das Férias (Competência)</td><td>${it.diasFf} dias</td><td class="prov-sub">${formatMoeda(salBaseFpImp)}</td><td class="desc-sub">${formatMoeda(salBaseFpImp)}</td></tr>`;
+        if (adicionaisFixos > 0) subRowsImp += `
+                <tr class="imp-sub-row"><td style="padding-left:14px">↳ Adicionais Fixos das Férias (Competência)</td><td>${it.diasFf} dias</td><td class="prov-sub">${formatMoeda(adicFpImp)}</td><td class="desc-sub">${formatMoeda(adicFpImp)}</td></tr>`;
+        if (mediasVar > 0) subRowsImp += `
+                <tr class="imp-sub-row"><td style="padding-left:14px">↳ Médias Variáveis das Férias (Competência)</td><td>${it.diasFf} dias</td><td class="prov-sub">${formatMoeda(mediasFpImp)}</td><td class="desc-sub">${formatMoeda(mediasFpImp)}</td></tr>`;
+
+        folhaHtml += `
+        <div class="folha-comp-header">
+            <h4>Competência: ${it.competencia} &nbsp;·&nbsp; Tabelas Ref.: ${mesReferenciaGlobal}</h4>
+        </div>
+        <table class="imp-table" style="margin-bottom:12px; page-break-inside:avoid">
+            <thead><tr>
+                <th>Item da Folha</th>
+                <th style="width:70px">Dias/Ref.</th>
+                <th style="width:100px; text-align:right">Proventos</th>
+                <th style="width:100px; text-align:right">Descontos</th>
+            </tr></thead>
+            <tbody>
+                <tr><td>Saldo de Salário (Período Trabalhado)</td><td>${it.diasTrab} dias</td><td class="prov">${formatMoeda(it.salario)}</td><td>—</td></tr>
+                ${subRowsImp}
+                <tr class="imp-sub-row"><td style="padding-left:14px">↳ 1/3 Constitucional de Férias Pro-rata (Competência)</td><td>Pro-rata</td><td class="prov-sub">${formatMoeda(it.terco)}</td><td class="desc-sub">${formatMoeda(it.terco)}</td></tr>
+                <tr class="imp-subtotal-row"><td><strong>Férias — Subtotal da Competência</strong></td><td>${it.diasFf} dias</td><td class="prov"><strong>${formatMoeda(it.ferias + it.terco)}</strong></td><td class="desc"><strong>${formatMoeda(it.ferias + it.terco)}</strong></td></tr>
+                <tr class="imp-sub-row"><td style="padding-left:14px">↳ INSS s/ Férias+1/3 — retido no recibo (pro-rata)</td><td>Recibo</td><td>—</td><td class="desc-sub">(−) ${formatMoeda(it.inss_recibo_comp)}</td></tr>
+                <tr class="imp-sub-row"><td style="padding-left:14px">↳ IRRF s/ Férias+1/3 — retido no recibo (pro-rata)</td><td>Recibo</td><td>—</td><td class="desc-sub">(−) ${formatMoeda(it.irrf_recibo_comp)}</td></tr>
+                <tr><td>INSS s/ Saldo de Salário (Folha)</td><td>Progressivo</td><td>—</td><td class="desc">${it.inss_folha > 0 ? formatMoeda(it.inss_folha) : '—'}</td></tr>
+                <tr><td>IRRF s/ Saldo de Salário (Folha)</td><td>Progressivo</td><td>—</td><td class="desc">${it.irrf_folha > 0 ? formatMoeda(it.irrf_folha) : '—'}</td></tr>
+                <tr class="liquido-row"><td colspan="2">SALDO LÍQUIDO DO CONTRACHEQUE NO MÊS</td><td colspan="2" style="text-align:right">${formatMoeda(it.liquido)}</td></tr>
+            </tbody>
+        </table>`;
+    });
+    document.getElementById('folhaCompetenciasImp').innerHTML = folhaHtml;
+}
 </script>
-
 </body>
 </html>
