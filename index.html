@@ -385,10 +385,13 @@
         #recibo-impressao { display:none; }
 
         @media print {
+            @page { size: A4; margin: 12mm 10mm; }
+            html, body { height:auto !important; background:#fff !important; }
+            body > header, body > .container { display:none !important; }
             body * { visibility:hidden; }
             #recibo-impressao, #recibo-impressao * { visibility:visible; }
             #recibo-impressao {
-                display:block !important; position:absolute; left:0; top:0;
+                display:block !important; position:static; left:auto; top:auto;
                 width:100%; background:#fff; color:#1a1a1a;
                 padding:18px 22px; font-family:'Segoe UI',Arial,sans-serif; font-size:8.5pt;
             }
@@ -407,7 +410,7 @@
             }
             .imp-block {
                 border:1.5px solid #c7d4e8; padding:16px 20px; margin-bottom:22px;
-                border-radius:0 0 7px 7px; page-break-inside:avoid; background:#fff;
+                border-radius:0 0 7px 7px; background:#fff;
             }
             .imp-block:not(:first-child) {
                 border-radius:7px; margin-top:0;
@@ -415,6 +418,7 @@
             .imp-section-hdr {
                 display:flex; align-items:center; justify-content:space-between;
                 border-bottom:2px solid #1e3a8a; padding-bottom:8px; margin-bottom:12px;
+                page-break-inside:avoid; page-break-after:avoid;
             }
             .imp-section-hdr h3 { color:#1e3a8a; font-size:9.5pt; font-weight:800; }
             .imp-section-hdr .ref-pill {
@@ -425,12 +429,18 @@
                 display:grid; grid-template-columns:1fr 1fr; gap:4px 14px;
                 font-size:8pt; margin-bottom:12px; background:#f8fafc;
                 padding:8px 11px; border-radius:5px; border:1px solid #e2e8f0;
+                page-break-inside:avoid; page-break-after:avoid;
             }
             .imp-meta .meta-label { color:#475569; font-weight:600; }
             .imp-meta .meta-val { color:#0f172a; font-weight:700; }
-            .imp-table {
-                width:100%; border-collapse:collapse; margin-top:6px; font-size:8pt;
+            .imp-meta .meta-row-nome-mat {
+                grid-column:span 2; display:flex; align-items:baseline;
+                justify-content:space-between; gap:10px;
             }
+            .imp-meta .meta-row-nome-mat .meta-mat { white-space:nowrap; text-align:right; }
+            .imp-table { width:100%; border-collapse:collapse; margin-top:6px; font-size:8pt; }
+            .imp-table thead { display:table-header-group; }
+            .imp-table tr { page-break-inside:avoid; break-inside:avoid; }
             .imp-table thead th {
                 background:#1e3a8a !important; color:#fff !important;
                 -webkit-print-color-adjust:exact; print-color-adjust:exact;
@@ -454,19 +464,24 @@
             }
             .sign-space {
                 display:flex; justify-content:space-around; margin-top:30px; font-size:8pt; color:#334155;
+                gap:20px; page-break-inside:avoid; break-inside:avoid;
             }
+            .sign-col { width:42%; text-align:center; }
             .sign-line {
-                border-top:1.5px solid #1e3a8a; width:38%; text-align:center;
+                border-top:1.5px solid #1e3a8a; width:100%; text-align:center;
                 padding-top:5px; color:#1e3a8a; font-weight:600;
             }
+            .sign-name { margin-top:3px; font-weight:700; color:#0f172a; font-size:8pt; }
             .page-break { page-break-before:always; }
             .folha-comp-header {
                 display:flex; align-items:center; gap:10px;
                 background:#f0fdf4 !important; border-left:4px solid #0d9488;
                 -webkit-print-color-adjust:exact; print-color-adjust:exact;
                 padding:7px 11px; border-radius:0 5px 5px 0; margin:14px 0 6px;
+                page-break-after:avoid; break-after:avoid;
             }
             .folha-comp-header h4 { color:#0d9488; font-size:8.5pt; font-weight:800; }
+            .comp-wrapper { page-break-inside:avoid; break-inside:avoid; }
         }
     </style>
 </head>
@@ -624,15 +639,17 @@
         <span class="ph-ref">Tabelas INSS/IRRF — Ref.: <span class="ref-mes-ano">--/----</span></span>
     </div>
 
-    <div class="imp-block">
+    <div class="imp-block recibo-block">
         <div class="imp-section-hdr">
             <h3>1. Dados do Período e Demonstrativo Financeiro</h3>
             <span class="ref-pill">Ref. <span class="ref-mes-ano-b">--/----</span></span>
         </div>
         <div class="imp-meta">
-            <div><span class="meta-label">Empregador (Fonte Pagadora):</span> <span class="meta-val" id="pCompany"></span></div>
-            <div><span class="meta-label">Matrícula:</span> <span class="meta-val" id="pMatricula"></span></div>
-            <div style="grid-column:span 2;"><span class="meta-label">Empregado:</span> <span class="meta-val" id="pEmployee"></span></div>
+            <div style="grid-column:span 2;"><span class="meta-label">Empregador (Fonte Pagadora):</span> <span class="meta-val" id="pCompany"></span></div>
+            <div class="meta-row-nome-mat">
+                <span><span class="meta-label">Empregado:</span> <span class="meta-val" id="pEmployee"></span></span>
+                <span class="meta-mat"><span class="meta-label">Matrícula:</span> <span class="meta-val" id="pMatricula"></span></span>
+            </div>
             <div style="grid-column:span 2;"><span class="meta-label">Período de Gozo:</span> <span class="meta-val">De <span id="pDataInic"></span> a <span id="pDataFim"></span> (<span id="pDias"></span> dias)</span></div>
         </div>
 
@@ -649,8 +666,19 @@
         </table>
 
         <div class="sign-space">
-            <div class="sign-line">Local e Data: ________________________________</div>
-            <div class="sign-line">Assinatura do Empregado</div>
+            <div class="sign-col">
+                <div class="sign-line">Assinatura do Empregador</div>
+                <div class="sign-name" id="pCompanySign"></div>
+            </div>
+            <div class="sign-col">
+                <div class="sign-line">Assinatura do Empregado</div>
+                <div class="sign-name" id="pEmployeeSign"></div>
+            </div>
+        </div>
+        <div class="sign-space" style="margin-top:14px;">
+            <div class="sign-col" style="width:90%">
+                <div class="sign-line">Local e Data: ________________________________</div>
+            </div>
         </div>
     </div>
 
@@ -671,8 +699,11 @@
             <span class="ref-pill">Regime de Competência</span>
         </div>
         <div class="imp-meta">
-            <div><span class="meta-label">Empregado:</span> <span class="meta-val" id="pEmployeeFolha"></span></div>
-            <div><span class="meta-label">Matrícula:</span> <span class="meta-val" id="pMatriculaFolha"></span></div>
+            <div style="grid-column:span 2;"><span class="meta-label">Empregador (Fonte Pagadora):</span> <span class="meta-val" id="pCompanyFolha"></span></div>
+            <div class="meta-row-nome-mat">
+                <span><span class="meta-label">Empregado:</span> <span class="meta-val" id="pEmployeeFolha"></span></span>
+                <span class="meta-mat"><span class="meta-label">Matrícula:</span> <span class="meta-val" id="pMatriculaFolha"></span></span>
+            </div>
         </div>
         <div id="folhaCompetenciasImp"></div>
     </div>
@@ -934,7 +965,7 @@ async function executarCalculosGlobais() {
     const descontosRecibo = inssRecibo + irrfRecibo;
     const liquidoRecibo   = brutoRecibo - descontosRecibo;
 
-    const rateio = calcularImpactoFolha(dataInicioStr, diasGozo, baseRemFf, salario + adicionais, inssRecibo, irrfRecibo);
+    const rateio = calcularImpactoFolha(dataInicioStr, diasGozo, baseRemFf, salario, adicionais, inssRecibo, irrfRecibo);
 
     renderizarPainelResultados(
         valorFeriasGozo, diasGozo, tercoConstitucional,
@@ -959,7 +990,7 @@ async function executarCalculosGlobais() {
 /* ====================================================
    RATEIO POR COMPETÊNCIA
    ==================================================== */
-function calcularImpactoFolha(dataInicioStr, diasGozo, baseRemFf, salFixo, inssRecibo, irrfRecibo) {
+function calcularImpactoFolha(dataInicioStr, diasGozo, baseRemFf, salBase, adicionaisFixos, inssRecibo, irrfRecibo) {
     /* Distribui os dias de férias por competência */
     const [a, m, d] = dataInicioStr.split('-').map(Number);
     let cur = new Date(a, m - 1, d);
@@ -969,12 +1000,19 @@ function calcularImpactoFolha(dataInicioStr, diasGozo, baseRemFf, salFixo, inssR
         dist[key] = (dist[key] || 0) + 1;
         cur.setDate(cur.getDate() + 1);
     }
+    const salFixo = salBase + adicionaisFixos;
     return Object.entries(dist).map(([comp, diasFf]) => {
+        /* Convenção CLT: mês comercial de 30 dias, sempre — independentemente
+           do nº de dias corridos que o mês civil de gozo realmente possua. */
         const diasTrab = Math.max(0, 30 - diasFf);
-        const salEfet  = (salFixo   / 30) * diasTrab;
+        /* Saldo de Salário do período trabalhado: inclui os Adicionais Fixos,
+           que são pagos todo mês ao empregado, além do salário-base. */
+        const salBaseEfet = (salBase        / 30) * diasTrab;
+        const adicEfet    = (adicionaisFixos / 30) * diasTrab;
+        const salEfet      = salBaseEfet + adicEfet;
         const ferProp  = (baseRemFf / 30) * diasFf;
         const tercProp = ferProp / 3;
-        /* Tributos da FOLHA: base = salário efetivo APENAS.
+        /* Tributos da FOLHA: base = salário efetivo (salário-base + adicionais fixos).
            Os tributos sobre férias+1/3 foram calculados com base própria
            no recibo (Art. 7º CF + Art. 145 CLT) e já retidos naquele documento. */
         const inss_folha = calcularINSS(salEfet);
@@ -986,7 +1024,8 @@ function calcularImpactoFolha(dataInicioStr, diasGozo, baseRemFf, salFixo, inssR
         const liquido = salEfet - inss_folha - irrf_folha;
         return {
             competencia: comp, diasTrab, diasFf,
-            salario: salEfet, ferias: ferProp, terco: tercProp,
+            salario: salEfet, salBaseEfet, adicEfet,
+            ferias: ferProp, terco: tercProp,
             bruto: salEfet + ferProp + tercProp,
             inss_folha, irrf_folha,
             inss_recibo_comp, irrf_recibo_comp,
@@ -1162,6 +1201,19 @@ function renderizarPainelResultados(vf, df, tf, va, ta, v13, inss, irrf, bruto, 
                     <td class="text-right">${formatMoeda(it.salario)}</td>
                     <td class="text-right">—</td>
                 </tr>
+                <tr class="row-base-detalhe">
+                    <td style="padding-left:1.1rem">↳ Salário-Base (Período Trabalhado)</td>
+                    <td>${it.diasTrab} dias</td>
+                    <td class="text-right val-prov-sub">${formatMoeda(it.salBaseEfet)}</td>
+                    <td class="text-right">—</td>
+                </tr>
+                ${adicionaisFixos > 0 ? `
+                <tr class="row-base-detalhe">
+                    <td style="padding-left:1.1rem">↳ Adicionais Fixos (Período Trabalhado)</td>
+                    <td>${it.diasTrab} dias</td>
+                    <td class="text-right val-prov-sub">${formatMoeda(it.adicEfet)}</td>
+                    <td class="text-right">—</td>
+                </tr>` : ''}
                 ${subRows}
                 <tr>
                     <td style="padding-left:1.1rem">↳ 1/3 Constitucional pro-rata (Competência)</td>
@@ -1224,6 +1276,9 @@ function preencherDadosImpressao(emp, empNome, mat, datInic, df,
     document.getElementById('pCompany').innerText       = emp;
     document.getElementById('pMatricula').innerText     = mat;
     document.getElementById('pEmployee').innerText      = empNome;
+    document.getElementById('pCompanySign').innerText    = emp;
+    document.getElementById('pEmployeeSign').innerText   = empNome;
+    document.getElementById('pCompanyFolha').innerText  = emp;
     document.getElementById('pEmployeeFolha').innerText = empNome;
     document.getElementById('pMatriculaFolha').innerText = mat;
 
@@ -1278,10 +1333,11 @@ function preencherDadosImpressao(emp, empNome, mat, datInic, df,
                 <tr class="imp-sub-row"><td style="padding-left:14px">↳ Médias Variáveis das Férias (Competência)</td><td>${it.diasFf} dias</td><td class="prov-sub">${formatMoeda(mediasFpImp)}</td><td class="desc-sub">${formatMoeda(mediasFpImp)}</td></tr>`;
 
         folhaHtml += `
+        <div class="comp-wrapper">
         <div class="folha-comp-header">
             <h4>Competência: ${it.competencia} &nbsp;·&nbsp; Tabelas Ref.: ${mesReferenciaGlobal}</h4>
         </div>
-        <table class="imp-table" style="margin-bottom:12px; page-break-inside:avoid">
+        <table class="imp-table" style="margin-bottom:12px">
             <thead><tr>
                 <th>Item da Folha</th>
                 <th style="width:70px">Dias/Ref.</th>
@@ -1290,6 +1346,8 @@ function preencherDadosImpressao(emp, empNome, mat, datInic, df,
             </tr></thead>
             <tbody>
                 <tr><td>Saldo de Salário (Período Trabalhado)</td><td>${it.diasTrab} dias</td><td class="prov">${formatMoeda(it.salario)}</td><td>—</td></tr>
+                <tr class="imp-sub-row"><td style="padding-left:14px">↳ Salário-Base (Período Trabalhado)</td><td>${it.diasTrab} dias</td><td class="prov-sub">${formatMoeda(it.salBaseEfet)}</td><td>—</td></tr>
+                ${adicionaisFixos > 0 ? `<tr class="imp-sub-row"><td style="padding-left:14px">↳ Adicionais Fixos (Período Trabalhado)</td><td>${it.diasTrab} dias</td><td class="prov-sub">${formatMoeda(it.adicEfet)}</td><td>—</td></tr>` : ''}
                 ${subRowsImp}
                 <tr class="imp-sub-row"><td style="padding-left:14px">↳ 1/3 Constitucional de Férias Pro-rata (Competência)</td><td>Pro-rata</td><td class="prov-sub">${formatMoeda(it.terco)}</td><td class="desc-sub">${formatMoeda(it.terco)}</td></tr>
                 <tr class="imp-subtotal-row"><td><strong>Férias — Subtotal da Competência</strong></td><td>${it.diasFf} dias</td><td class="prov"><strong>${formatMoeda(it.ferias + it.terco)}</strong></td><td class="desc"><strong>${formatMoeda(it.ferias + it.terco)}</strong></td></tr>
@@ -1299,7 +1357,8 @@ function preencherDadosImpressao(emp, empNome, mat, datInic, df,
                 <tr><td>IRRF s/ Saldo de Salário (Folha)</td><td>Progressivo</td><td>—</td><td class="desc">${it.irrf_folha > 0 ? formatMoeda(it.irrf_folha) : '—'}</td></tr>
                 <tr class="liquido-row"><td colspan="2">SALDO LÍQUIDO DO CONTRACHEQUE NO MÊS</td><td colspan="2" style="text-align:right">${formatMoeda(it.liquido)}</td></tr>
             </tbody>
-        </table>`;
+        </table>
+        </div>`;
     });
     document.getElementById('folhaCompetenciasImp').innerHTML = folhaHtml;
 }
